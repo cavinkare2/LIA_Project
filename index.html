@@ -23,7 +23,14 @@
 </div>
 
 <div class="container">
-  <div id="loading" class="loading">Loading LIA Project data... Counts load for all rows; heavy views are paginated/capped for speed.</div>
+  <div id="loading" class="loading">
+<div style="font-size:22px;font-weight:900;color:#1d4ed8;margin-bottom:12px;">LIA Project Dashboard</div>
+<div id="loadingStage" style="font-size:16px;font-weight:700;margin-bottom:10px;color:#374151;">Initializing...</div>
+<div id="loadingPercent" style="font-size:32px;font-weight:900;color:#16a34a;margin-bottom:12px;">0%</div>
+<div style="width:100%;max-width:700px;margin:auto;height:24px;background:#e5e7eb;border-radius:30px;overflow:hidden;">
+<div id="loadingBar" style="width:0%;height:100%;background:linear-gradient(90deg,#16a34a,#22c55e);transition:width .3s ease;"></div>
+</div>
+</div>
 
   <div class="grid-2">
     <div class="panel">
@@ -128,10 +135,20 @@ const TABLE_PAGE_SIZE=100;
 const MAP_POINT_LIMIT=1500;
 const COUNTER_CARD_LIMIT=150;
 let currentPage=1;
+
+function updateLoading(percent, stage){
+ const p=document.getElementById("loadingPercent");
+ const s=document.getElementById("loadingStage");
+ const b=document.getElementById("loadingBar");
+ if(p)p.innerHTML=percent+"%";
+ if(s)s.innerHTML=stage;
+ if(b)b.style.width=percent+"%";
+}
+
 window.onload=()=>loadAllSheets();
-function loadAllSheets(){document.getElementById("loading").style.display="block";loadedSheets={};loadIndex=0;loadNextSheet()}
+function loadAllSheets(){document.getElementById("loading").style.display="block";updateLoading(1,"Initializing Dashboard");loadedSheets={};loadIndex=0;loadNextSheet()}
 function loadNextSheet(){if(loadIndex>=SHEETS.length){mergeSheets();document.getElementById("loading").style.display="none";renderAll();return}const sh=SHEETS[loadIndex];if(currentScript)currentScript.remove();const target=sh.gid?("gid="+encodeURIComponent(sh.gid)):("sheet="+encodeURIComponent(sh.name));const url="https://docs.google.com/spreadsheets/d/"+SHEET_ID+"/gviz/tq?"+target+"&tqx=responseHandler:handleSheetData&cacheBust="+Date.now();currentScript=document.createElement("script");currentScript.src=url;currentScript.onerror=function(){loadedSheets[sh.alias||sh.name]=[];loadIndex++;loadNextSheet()};document.body.appendChild(currentScript)}
-function handleSheetData(response){const sh=SHEETS[loadIndex];loadedSheets[sh.alias||sh.name]=parseGvizRows(response);loadIndex++;loadNextSheet()}
+function handleSheetData(response){const sh=SHEETS[loadIndex];loadedSheets[sh.alias||sh.name]=parseGvizRows(response);const progressMap={0:20,1:40,2:60,3:80,4:95};updateLoading(progressMap[loadIndex]||90,(sh.alias||sh.name)+" Loaded");loadIndex++;setTimeout(loadNextSheet,100)}
 function parseGvizRows(response){const rows=response.table.rows||[],headers=(response.table.cols||[]).map(c=>c.label||c.id||"");return rows.map((r,rowIndex)=>{const obj={_rowIndex:rowIndex};(r.c||[]).forEach((cell,i)=>{const header=headers[i]||("COL"+i),headerNorm=norm(header);let value="";if(cell){if(headerNorm==="visitdate"){value=cell.f!==undefined&&cell.f!==null&&cell.f!==""?cell.f:(cell.v!==undefined&&cell.v!==null?cell.v:"")}else if(headerNorm==="date"){value=cell.f!==undefined&&cell.f!==null&&cell.f!==""?cell.f:(cell.v!==undefined&&cell.v!==null?cell.v:"")}else{value=cell.f!==undefined&&cell.f!==null&&cell.f!==""?cell.f:(cell.v!==undefined&&cell.v!==null?cell.v:"")}}obj[header]=value});return obj}).filter(r=>Object.values(r).some(v=>String(v||"").trim()!==""))}
 function mergeSheets(){
   const master=loadedSheets.Institution_Master||[];
@@ -332,9 +349,16 @@ function isTrueInstitutionAuditRow(row){
   return isVerified(row) && source!=="Counter_Only" && source!=="New_Institution";
 }
 function getSheet1VerifiedInstitutionRows(){
-  return (loadedSheets.Institution_Master||[])
-    .map(r=>normalizeRow(r,"Master"))
-    .filter(r=>isVerified(r));
+ const rows=loadedSheets.Institution_Master||[];
+ const output=[];
+ for(let i=0;i<rows.length;i++){
+   const r=rows[i];
+   const verified=String(r["Verified"]||"").toLowerCase().trim();
+   if(verified==="yes"||verified==="true"||verified==="1"){
+      output.push({visitDate:r["Visit_Date"]||r["Visit Date"]||r["Date"]||""});
+   }
+ }
+ return output;
 }
 function getOutputCounterRowsForChart(){
   return (loadedSheets.Output||[])
