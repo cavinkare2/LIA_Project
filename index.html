@@ -101,8 +101,34 @@
 
 <script>
 const SHEET_ID="1QTSojh8sj91-e59wo4jiBXf8fNA44pvNnjyyzh7ML5Y";
+const SDE_SHEET_NAMES=[
+  "Pandi selvi",
+  "Rameshkumar",
+  "Sanjeev Kumar",
+  "Satyajit Das",
+  "Praveen Raj",
+  "Ijaj Ahmad",
+  "Arul Amrutham",
+  "Anand Mohan Singh",
+  "Abhishek",
+  "Saroj Yadav",
+  "Siva Naga Kumar",
+  "Kalyan Babu",
+  "Sridhar R",
+  "Balaji K",
+  "Ragavan M",
+  "Ghanshyam Kumar",
+  "Ganesh Baikar",
+  "Shakeel Ansari",
+  "Tainur Shaikh",
+  "Vivek Harsh",
+  "Ashish Shukla",
+  "Gaurav Maheshwari",
+  "Mahesh",
+  "Niraj Sharma"
+];
 const SHEETS=[
-  {name:"Sheet1",alias:"Institution_Master",gid:"1071990263"},
+  ...SDE_SHEET_NAMES.map(name=>({name:name,alias:"Institution_Master",sourceSheet:name})),
   {name:"Output",alias:"Output",gid:"2043922333"},
   {name:"New_Institutions",alias:"New_Institutions"},
   {name:"MRP_Counters",alias:"MRP_Counters"},
@@ -113,8 +139,10 @@ const TABLE_PAGE_SIZE=100, MAP_POINT_LIMIT=1500, COUNTER_CARD_LIMIT=150;let curr
 function updateLoading(percent,stage){setHtml("loadingPercent",percent+"%");setHtml("loadingStage",stage);const b=document.getElementById("loadingBar");if(b)b.style.width=percent+"%"}
 window.onload=()=>loadAllSheets();
 function loadAllSheets(){document.getElementById("loading").style.display="block";updateLoading(1,"Initializing Dashboard");loadedSheets={};loadIndex=0;loadNextSheet()}
-function loadNextSheet(){if(loadIndex>=SHEETS.length){mergeSheets();document.getElementById("loading").style.display="none";renderAll();return}const sh=SHEETS[loadIndex];if(currentScript)currentScript.remove();const target=sh.gid?("gid="+encodeURIComponent(sh.gid)):("sheet="+encodeURIComponent(sh.name));const url="https://docs.google.com/spreadsheets/d/"+SHEET_ID+"/gviz/tq?"+target+"&tqx=responseHandler:handleSheetData&cacheBust="+Date.now();currentScript=document.createElement("script");currentScript.src=url;currentScript.onerror=function(){loadedSheets[sh.alias||sh.name]=[];loadIndex++;loadNextSheet()};document.body.appendChild(currentScript)}
-function handleSheetData(response){const sh=SHEETS[loadIndex];loadedSheets[sh.alias||sh.name]=parseGvizRows(response);const progressMap={0:20,1:40,2:60,3:80,4:95};updateLoading(progressMap[loadIndex]||90,(sh.alias||sh.name)+" Loaded");loadIndex++;setTimeout(loadNextSheet,100)}
+function appendLoadedSheet(alias,rows){if(!loadedSheets[alias])loadedSheets[alias]=[];loadedSheets[alias]=loadedSheets[alias].concat(rows||[])}
+function loadingProgress(){return Math.min(95,Math.round(((loadIndex+1)/SHEETS.length)*95))}
+function loadNextSheet(){if(loadIndex>=SHEETS.length){mergeSheets();document.getElementById("loading").style.display="none";renderAll();return}const sh=SHEETS[loadIndex];if(currentScript)currentScript.remove();const target=sh.gid?("gid="+encodeURIComponent(sh.gid)):("sheet="+encodeURIComponent(sh.name));const url="https://docs.google.com/spreadsheets/d/"+SHEET_ID+"/gviz/tq?"+target+"&tqx=responseHandler:handleSheetData&cacheBust="+Date.now();currentScript=document.createElement("script");currentScript.src=url;currentScript.onerror=function(){appendLoadedSheet(sh.alias||sh.name,[]);updateLoading(loadingProgress(),"Skipped / could not load: "+(sh.sourceSheet||sh.name));loadIndex++;loadNextSheet()};document.body.appendChild(currentScript)}
+function handleSheetData(response){const sh=SHEETS[loadIndex];appendLoadedSheet(sh.alias||sh.name,parseGvizRows(response));updateLoading(loadingProgress(),(sh.sourceSheet||sh.alias||sh.name)+" Loaded");loadIndex++;setTimeout(loadNextSheet,100)}
 function parseGvizRows(response){const rows=response.table.rows||[],headers=(response.table.cols||[]).map(c=>c.label||c.id||"");return rows.map((r,rowIndex)=>{const obj={_rowIndex:rowIndex};(r.c||[]).forEach((cell,i)=>{const header=headers[i]||("COL"+i);let value="";if(cell)value=cell.f!==undefined&&cell.f!==null&&cell.f!==""?cell.f:(cell.v!==undefined&&cell.v!==null?cell.v:"");obj[header]=value});return obj}).filter(r=>Object.values(r).some(v=>String(v||"").trim()!==""))}
 function mergeSheets(){const master=loadedSheets.Institution_Master||[],output=loadedSheets.Output||[],newInst=loadedSheets.New_Institutions||[],mainCounterRows=loadedSheets.MRP_Counters||[],oppositeCounterRows=loadedSheets.Opposite_MRP_Counters||[];const rows=[];master.forEach(r=>rows.push(normalizeRow(r,"Master")));newInst.forEach(r=>rows.push(normalizeRow(r,"New_Institution")));output.forEach(r=>rows.push(normalizeRow(r,"Output")));allRows=dedupeRows(rows);const byAudit={};allRows.forEach(r=>{if(r.auditId)byAudit[normalizeKey(r.auditId)]=r});const addCounterSheetRows=(sheetRows,side)=>{sheetRows.forEach(cr=>{const aid=pick(cr,["Audit_ID","Audit ID"]);if(!aid)return;const key=normalizeKey(aid);let inst=byAudit[key];if(!inst){inst=normalizeRow(cr,"Counter_Only");inst.verified="Yes";inst.auditId=aid;inst.mainCounters=[];inst.oppositeCounters=[];inst.counters=[];allRows.push(inst);byAudit[key]=inst}const c=parseCounterSheetRow(cr,side);if(!c.outletName&&!c.rawPhone&&!c.photo&&!c.counterStatus&&!c.orderValue)return;const target=side==="Opposite"?inst.oppositeCounters:inst.mainCounters;const ckey=[c.side,c.counterNo,c.outletName,c.rawPhone,c.photo,c.orderValue].map(normalizeKey).join("|");if(!target.some(x=>[x.side,x.counterNo,x.outletName,x.rawPhone,x.photo,x.orderValue].map(normalizeKey).join("|")===ckey))target.push(c);inst.counters=inst.mainCounters.concat(inst.oppositeCounters)})};addCounterSheetRows(mainCounterRows,"Main");addCounterSheetRows(oppositeCounterRows,"Opposite");allRows=dedupeRows(allRows)}
 function dedupeRows(rows){const byKey={};rows.forEach(r=>{const key=r.auditId?"audit:"+normalizeKey(r.auditId):"inst:"+[r.institutionName,r.district,r.pincode,r.sde].map(normalizeKey).join("|");if(!key.replace(/audit:|inst:|\|/g,"").trim())return;const existing=byKey[key];if(!existing||rowCompletenessScore(r)>rowCompletenessScore(existing))byKey[key]=r});let out=Object.values(byKey);const verifiedCombos=new Set(out.filter(r=>r.sourceType!=="New_Institution"&&isVerified(r)).map(r=>[r.institutionName,r.district,r.pincode,r.sde].map(normalizeKey).join("|")));out=out.filter(r=>!(r.sourceType==="New_Institution"&&verifiedCombos.has([r.institutionName,r.district,r.pincode,r.sde].map(normalizeKey).join("|"))));return out}
