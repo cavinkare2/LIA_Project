@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LIA Project Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    *{box-sizing:border-box}html,body{max-width:100%;overflow-x:hidden}body{font-family:Arial,sans-serif;background:#eef2f7;margin:0;color:#1f2937;font-size:14px}.header{background:linear-gradient(135deg,#0f172a,#1d4ed8);color:white;padding:18px 24px;border-bottom-left-radius:24px;border-bottom-right-radius:24px;box-shadow:0 5px 18px rgba(0,0,0,.18);position:relative;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}.brand-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;min-width:260px;flex:1}.logo{height:44px;width:auto;object-fit:contain}.header h1{margin:0;font-size:24px;font-weight:900;letter-spacing:.2px;line-height:1.1}.top-actions{display:flex;flex-direction:column;gap:7px;align-items:stretch;width:190px;max-width:100%;flex:0 0 190px}.top-btn{border:none;padding:8px 12px;border-radius:999px;cursor:pointer;font-weight:900;background:white;color:#1d4ed8;box-shadow:0 3px 10px rgba(0,0,0,.16);width:100%;font-size:11px;text-align:center;line-height:1.15;white-space:nowrap}.top-btn.green{background:#dcfce7;color:#166534}.top-btn.orange{background:#ffedd5;color:#9a3412}.container{padding:20px;max-width:1480px;margin:0 auto}.loading{background:linear-gradient(135deg,#eff6ff,#ffffff 55%,#fff7ed);color:#1f2937;padding:18px 16px;border-radius:18px;margin-bottom:20px;font-weight:bold;border:1px solid #dbeafe;text-align:center;position:relative;overflow:hidden;box-shadow:0 6px 20px rgba(15,23,42,.10)}.loading>*{position:relative;z-index:1}.loading-scene{height:118px;max-width:620px;margin:0 auto 8px;position:relative;overflow:hidden;border-radius:18px;background:linear-gradient(180deg,#e0f2fe 0%,#f8fafc 64%,#e5e7eb 65%,#f1f5f9 100%);border:1px solid #bfdbfe}.loading-road{position:absolute;left:0;right:0;bottom:20px;height:3px;background:repeating-linear-gradient(90deg,#94a3b8 0 28px,transparent 28px 48px);animation:roadMove 1.2s linear infinite}.loader-character{position:absolute;left:50%;bottom:25px;width:74px;height:74px;transform:translateX(-50%);animation:characterBob .7s ease-in-out infinite}.char-head{position:absolute;top:0;left:22px;width:30px;height:30px;border-radius:50%;background:#fbbf24;border:3px solid #0f172a}.char-hair{position:absolute;top:-2px;left:24px;width:26px;height:12px;background:#0f172a;border-radius:14px 14px 4px 4px}.char-body{position:absolute;top:31px;left:18px;width:38px;height:32px;border-radius:12px 12px 8px 8px;background:#1d4ed8;border:3px solid #0f172a}.char-face{position:absolute;top:11px;left:30px;font-size:11px;line-height:1}.char-arm{position:absolute;top:36px;width:24px;height:8px;background:#fbbf24;border:3px solid #0f172a;border-radius:20px;transform-origin:left center}.char-arm.left{left:3px;transform:rotate(28deg);animation:armLeft .7s ease-in-out infinite}.char-arm.right{right:2px;transform:rotate(-28deg);animation:armRight .7s ease-in-out infinite}.char-leg{position:absolute;top:61px;width:12px;height:18px;background:#0f172a;border-radius:8px;transform-origin:top center}.char-leg.left{left:22px;animation:legLeft .7s ease-in-out infinite}.char-leg.right{right:22px;animation:legRight .7s ease-in-out infinite}.char-laptop{position:absolute;right:-12px;top:43px;width:30px;height:18px;background:#cbd5e1;border:3px solid #0f172a;border-radius:4px;transform:rotate(-8deg)}.data-bubble{position:absolute;min-width:50px;padding:6px 8px;border-radius:999px;background:white;border:1px solid #bfdbfe;box-shadow:0 4px 12px rgba(15,23,42,.10);font-size:11px;font-weight:900;color:#1d4ed8;animation:bubbleFloat 2.2s ease-in-out infinite}.data-bubble.b1{left:12%;top:18px}.data-bubble.b2{right:13%;top:24px;animation-delay:.5s;color:#16a34a}.data-bubble.b3{left:28%;top:68px;animation-delay:.9s;color:#ea580c}.loading-title{font-size:23px;font-weight:900;color:#1d4ed8;margin-bottom:4px}.loading-subtitle{font-size:12px;font-weight:900;color:#64748b;letter-spacing:.35px;text-transform:uppercase;margin-bottom:10px}.loading-dots{display:flex;gap:5px;justify-content:center;align-items:center;margin:8px 0 6px}.loading-dots span{width:7px;height:7px;border-radius:50%;background:#1d4ed8;animation:bounceDots 1s infinite ease-in-out}.loading-dots span:nth-child(2){animation-delay:.15s;background:#16a34a}.loading-dots span:nth-child(3){animation-delay:.30s;background:#ea580c}.loading-tip{max-width:720px;margin:8px auto 0;background:rgba(255,255,255,.78);border:1px solid #dbeafe;color:#334155;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:900}.loading-bar-wrap{width:100%;max-width:690px;margin:auto;height:18px;background:#e5e7eb;border-radius:30px;overflow:hidden;box-shadow:inset 0 2px 8px rgba(15,23,42,.12)}#loadingBar{width:0%;height:100%;background:linear-gradient(90deg,#1d4ed8,#16a34a);transition:width .3s ease;position:relative;overflow:hidden}#loadingBar::after{content:"";position:absolute;top:0;bottom:0;width:72px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.62),transparent);animation:barShine 1.15s linear infinite}@keyframes characterBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-5px)}}@keyframes armLeft{0%,100%{transform:rotate(30deg)}50%{transform:rotate(-15deg)}}@keyframes armRight{0%,100%{transform:rotate(-28deg)}50%{transform:rotate(15deg)}}@keyframes legLeft{0%,100%{transform:rotate(-18deg)}50%{transform:rotate(18deg)}}@keyframes legRight{0%,100%{transform:rotate(18deg)}50%{transform:rotate(-18deg)}}@keyframes roadMove{to{background-position:-48px 0}}@keyframes bubbleFloat{0%,100%{transform:translateY(0);opacity:.82}50%{transform:translateY(-8px);opacity:1}}@keyframes bounceDots{0%,80%,100%{transform:translateY(0);opacity:.45}40%{transform:translateY(-7px);opacity:1}}@keyframes barShine{0%{left:-85px}100%{left:100%}}.panel,.box{background:white;padding:18px;border-radius:20px;box-shadow:0 4px 14px rgba(0,0,0,.08);margin-bottom:24px;border:1px solid #dbeafe;min-width:0;overflow:hidden}.panel h2,.box h2{margin:0 0 16px;font-size:22px;color:#111827;border-bottom:1px solid #e5e7eb;padding-bottom:10px;text-align:center}.cards{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}.card{background:#f8fafc;border-radius:16px;padding:14px 10px;border-left:6px solid #1d4ed8;text-align:center;min-width:0}.card h3{margin:0;font-size:clamp(22px,2vw,32px);line-height:1.1;color:#1d4ed8}.card p{margin:8px 0 0;font-size:12px;font-weight:900;color:#475569;line-height:1.25;text-transform:uppercase;letter-spacing:.3px}.green{border-left-color:#16a34a}.green h3{color:#16a34a}.orange{border-left-color:#ea580c}.orange h3{color:#ea580c}.red{border-left-color:#dc2626}.red h3{color:#dc2626}.purple{border-left-color:#7c3aed}.purple h3{color:#7c3aed}.gray{border-left-color:#4b5563}.gray h3{color:#4b5563}.blue{border-left-color:#1d4ed8}.blue h3{color:#1d4ed8}#overallOrderValue,#todayOrderValue{font-size:clamp(13px,1.05vw,18px);line-height:1.1;white-space:nowrap}.cards.kpi-cards{grid-template-columns:repeat(7,minmax(0,1fr));gap:7px}.kpi-cards .card{padding:10px 5px;border-left-width:5px;border-radius:14px}.kpi-cards .card h3{font-size:clamp(16px,1.35vw,24px);line-height:1.05}.kpi-cards .card p{margin-top:6px;font-size:9.5px;line-height:1.1;letter-spacing:0}.kpi-cards .card p{word-break:normal}.kpi-cards #overallOrderValue,.kpi-cards #todayOrderValue{font-size:clamp(12px,.95vw,17px)}.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:22px}.filters{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:14px}.filters select,.filters input{width:100%;padding:11px 13px;border-radius:12px;border:1px solid #cbd5e1;background:#fff;font-weight:700;color:#1f2937}.filter-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:12px 0 0}.filter-btn{border:none;padding:10px 18px;border-radius:999px;cursor:pointer;font-weight:900;background:#e5e7eb;color:#374151}.filter-btn.active{background:#1d4ed8;color:white}.filter-btn.green.active{background:#16a34a}.filter-btn.orange.active{background:#ea580c}.filter-btn.gray.active{background:#4b5563}.pager{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin:12px 0;font-weight:900}.pager button{border:none;border-radius:999px;padding:8px 12px;background:#e5e7eb;color:#374151;cursor:pointer;font-weight:900}.pager button.active{background:#1d4ed8;color:white}.perf-note{background:#ecfeff;border:1px solid #67e8f9;color:#155e75;border-radius:12px;padding:10px 12px;text-align:center;font-weight:900;margin:10px 0}.table-wrap{width:100%;max-width:100%;overflow:auto;border-radius:12px;border:1px solid #e5e7eb;max-height:720px}table{width:100%;border-collapse:collapse;background:white}th{background:#1e40af;color:white;padding:12px 10px;text-align:center;font-size:12px;position:sticky;top:0;z-index:2}td{padding:11px 9px;border-bottom:1px solid #e5e7eb;font-size:12px;text-align:center;vertical-align:middle;line-height:1.3}tr:hover{background:#f8fafc}.summary-row{font-weight:900;background:#f1f5f9}.detail-table{min-width:2050px}.summary-table{table-layout:fixed}.badge{padding:6px 10px;border-radius:999px;font-size:11px;font-weight:900;display:inline-block;white-space:nowrap}.badge-yes{background:#dcfce7;color:#166534}.badge-no{background:#fee2e2;color:#991b1b}.badge-warn{background:#ffedd5;color:#9a3412}.badge-info{background:#dbeafe;color:#1e40af}.badge-gray{background:#e5e7eb;color:#374151}.badge-bad{background:#fee2e2;color:#991b1b}.photo{width:150px;height:110px;object-fit:cover;border-radius:12px;border:1px solid #cbd5e1;cursor:pointer;background:#f1f5f9;box-shadow:0 3px 10px rgba(0,0,0,.16)}.photo:hover{transform:scale(1.04);transition:.2s}.photo.small{width:115px;height:84px}.no-photo{font-size:12px;color:#94a3b8;font-weight:900}.name-cell{text-align:left;font-weight:900;color:#111827;min-width:210px}.muted{color:#64748b;font-weight:700}.map-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;font-size:13px;font-weight:900;color:#374151;justify-content:center}.legend-item{display:flex;align-items:center;gap:7px}.dot{width:14px;height:14px;border-radius:50%;display:inline-block}.dot-green{background:#16a34a}.dot-orange{background:#ea580c}.dot-gray{background:#94a3b8}.map-marker{width:20px;height:20px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,.4)}.marker-verified{background:#16a34a}.marker-pending{background:#94a3b8}.marker-entryno{background:#ea580c}#map{width:100%;height:560px;border-radius:16px;border:1px solid #cbd5e1;overflow:hidden}.popup-title{font-weight:900;font-size:14px;margin-bottom:6px;text-align:center}.tracker-chart-wrap{width:100%;height:430px;position:relative;background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);border:1px solid #e2e8f0;border-radius:18px;padding:18px 18px 10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}.institution-card{background:#f8fafc;border:1px solid #dbeafe;border-radius:16px;margin:0 0 14px;padding:14px}.institution-head{display:grid;grid-template-columns:1.5fr repeat(6,minmax(90px,.6fr));gap:10px;align-items:center}.institution-title{font-size:15px;font-weight:900;color:#0f172a}.institution-sub{font-size:12px;color:#64748b;font-weight:700;margin-top:4px}.mini-metric{background:white;border:1px solid #e2e8f0;border-radius:12px;padding:10px;text-align:center}.mini-metric b{font-size:20px;color:#1d4ed8}.mini-metric span{display:block;font-size:10px;text-transform:uppercase;color:#64748b;font-weight:900;margin-top:3px}.counter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px}.counter-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px;text-align:left;box-shadow:0 2px 8px rgba(15,23,42,.06)}.counter-card h4{margin:0 0 8px;color:#0f172a}.counter-card div{font-size:12px;margin:5px 0;color:#334155;font-weight:700}.modal{display:none;position:fixed;z-index:99;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.82);justify-content:center;align-items:center;padding:20px}.modal img{max-width:94%;max-height:90%;border-radius:14px;background:white;padding:5px}.close{position:absolute;right:30px;top:18px;color:white;font-size:40px;font-weight:bold;cursor:pointer}@media(max-width:950px){.cards{grid-template-columns:repeat(4,minmax(0,1fr))}.filters{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-2{grid-template-columns:1fr}.institution-head{grid-template-columns:1fr 1fr 1fr}}@media(max-width:750px){.header{display:block;padding:15px 16px;border-bottom-left-radius:20px;border-bottom-right-radius:20px}.top-actions{margin-top:12px;width:100%;max-width:260px;flex:none}.cards,.filters,.institution-head{grid-template-columns:1fr}.container{padding:14px}.header h1{font-size:22px}#map{height:420px}}
+  @media(max-width:750px){.cards.kpi-cards{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi-cards .card h3{font-size:clamp(18px,5vw,26px)}.kpi-cards .card p{font-size:10px}}
+@media(min-width:951px){.grid-2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}.grid-2>.panel,.grid-2>.box{min-width:0}.cards.kpi-cards{grid-template-columns:repeat(7,minmax(0,1fr))!important}}
+
+.game-loader{max-width:760px;margin:0 auto 10px}.game-screen{height:160px;max-width:760px;margin:0 auto;border-radius:20px;position:relative;overflow:hidden;background:linear-gradient(180deg,#dbeafe 0%,#eff6ff 48%,#f8fafc 49%,#e2e8f0 100%);border:1px solid #bfdbfe;box-shadow:inset 0 -10px 28px rgba(15,23,42,.08),0 10px 24px rgba(15,23,42,.08)}.game-hud{position:absolute;left:10px;right:10px;top:10px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;z-index:2}.hud-pill{background:rgba(255,255,255,.88);border:1px solid #bfdbfe;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:900;color:#1e3a8a;box-shadow:0 4px 10px rgba(15,23,42,.07)}.game-level{position:absolute;right:14px;top:46px;background:#0f172a;color:#fff;border-radius:999px;padding:6px 12px;font-size:11px;font-weight:900;letter-spacing:.4px;z-index:2}.game-message{position:absolute;left:14px;top:48px;background:rgba(255,255,255,.85);border:1px solid #bfdbfe;border-radius:999px;padding:6px 12px;font-size:11px;font-weight:900;color:#334155;z-index:2}.game-cloud{position:absolute;background:rgba(255,255,255,.92);border-radius:999px;filter:drop-shadow(0 5px 8px rgba(148,163,184,.25));animation:cloudDrift linear infinite}.game-cloud:before,.game-cloud:after{content:"";position:absolute;background:rgba(255,255,255,.92);border-radius:50%}.game-cloud.gc1{width:70px;height:24px;top:22px;left:-90px;animation-duration:14s}.game-cloud.gc1:before{width:28px;height:28px;left:10px;top:-13px}.game-cloud.gc1:after{width:36px;height:36px;right:10px;top:-16px}.game-cloud.gc2{width:52px;height:18px;top:66px;left:-70px;animation-duration:19s;animation-delay:3s}.game-cloud.gc2:before{width:24px;height:24px;left:7px;top:-11px}.game-cloud.gc2:after{width:24px;height:24px;right:6px;top:-10px}.game-cloud.gc3{width:92px;height:28px;top:14px;left:-120px;animation-duration:22s;animation-delay:6s}.game-cloud.gc3:before{width:34px;height:34px;left:14px;top:-16px}.game-cloud.gc3:after{width:40px;height:40px;right:12px;top:-18px}.game-item{position:absolute;display:flex;align-items:center;justify-content:center;font-weight:900;z-index:2;animation:itemMove linear infinite}.coin{width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 32% 30%,#fef9c3,#facc15 70%,#ca8a04 100%);color:#92400e;font-size:13px;box-shadow:0 4px 10px rgba(234,179,8,.3)}.badge-item{min-width:40px;height:28px;padding:0 10px;border-radius:999px;background:#fff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:11px;box-shadow:0 4px 10px rgba(15,23,42,.08)}.item-sde{background:#eff6ff;color:#1d4ed8}.item-kpi{background:#dcfce7;color:#166534}.item-map{background:#ffedd5;color:#9a3412}.item-img{background:#ede9fe;color:#6d28d9}.coin1{top:76px;right:-40px;animation-duration:4.6s}.coin2{top:42px;right:-140px;animation-duration:5.2s;animation-delay:1s}.coin3{top:87px;right:-250px;animation-duration:5.8s;animation-delay:.6s}.item-sde{top:34px;right:-330px;animation-duration:6.4s;animation-delay:.8s}.item-kpi{top:74px;right:-470px;animation-duration:6.9s;animation-delay:2s}.item-map{top:56px;right:-580px;animation-duration:7.2s;animation-delay:1.1s}.item-img{top:92px;right:-700px;animation-duration:7.8s;animation-delay:2.7s}.game-obstacle{position:absolute;bottom:28px;width:18px;height:26px;background:linear-gradient(180deg,#334155,#0f172a);border-radius:5px 5px 3px 3px;box-shadow:0 4px 10px rgba(15,23,42,.14);z-index:1;animation:itemMove linear infinite}.game-obstacle:before{content:"";position:absolute;top:-8px;left:2px;right:2px;height:8px;border-radius:4px;background:#ef4444}.obs1{right:-120px;animation-duration:6s;animation-delay:1.2s}.obs2{right:-480px;animation-duration:7.6s;animation-delay:3s}.runner-wrap{position:absolute;left:80px;bottom:25px;width:86px;height:86px;animation:runnerHop .85s ease-in-out infinite;z-index:3}.runner-shadow{position:absolute;left:16px;bottom:3px;width:52px;height:10px;border-radius:50%;background:rgba(15,23,42,.12);animation:shadowPulse .85s ease-in-out infinite}.runner-character{position:absolute;inset:0}.runner-head{position:absolute;top:6px;left:25px;width:28px;height:28px;border-radius:50%;background:#fbbf24;border:3px solid #0f172a}.runner-hair{position:absolute;top:4px;left:27px;width:24px;height:11px;background:#0f172a;border-radius:12px 12px 5px 5px}.runner-face{position:absolute;top:18px;left:33px;font-size:10px;color:#0f172a}.runner-body{position:absolute;top:35px;left:20px;width:36px;height:30px;border-radius:12px 12px 8px 8px;background:#2563eb;border:3px solid #0f172a}.runner-pack{position:absolute;top:38px;left:47px;width:18px;height:24px;border-radius:8px;background:#16a34a;border:3px solid #0f172a}.runner-arm{position:absolute;top:40px;width:24px;height:8px;background:#fbbf24;border:3px solid #0f172a;border-radius:999px;transform-origin:left center}.runner-arm.arm-left{left:4px;animation:armLeft .6s ease-in-out infinite}.runner-arm.arm-right{right:1px;animation:armRight .6s ease-in-out infinite}.runner-leg{position:absolute;top:64px;width:12px;height:18px;background:#0f172a;border-radius:8px;transform-origin:top center}.runner-leg.leg-left{left:24px;animation:legLeft .6s ease-in-out infinite}.runner-leg.leg-right{right:24px;animation:legRight .6s ease-in-out infinite}.game-ground{position:absolute;left:0;right:0;bottom:0;height:36px;background:linear-gradient(180deg,#64748b 0%,#475569 100%)}.ground-dash{position:absolute;left:0;right:0;bottom:18px;height:4px;background:repeating-linear-gradient(90deg,#f8fafc 0 24px,transparent 24px 40px);animation:roadMove .85s linear infinite}.loading-subtitle{max-width:720px;margin:0 auto 10px}.loading-tip{max-width:800px}@keyframes cloudDrift{0%{transform:translateX(0)}100%{transform:translateX(920px)}}@keyframes itemMove{0%{transform:translateX(0) rotate(0deg)}100%{transform:translateX(-930px) rotate(-360deg)}}@keyframes runnerHop{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}@keyframes shadowPulse{0%,100%{transform:scaleX(1);opacity:.16}50%{transform:scaleX(.82);opacity:.08}}@media(max-width:750px){.game-screen{height:180px}.game-hud{justify-content:center}.game-level{top:78px}.game-message{top:108px;left:50%;transform:translateX(-50%);text-align:center;max-width:92%}.runner-wrap{left:22px;bottom:26px;transform:scale(.92)} }
+
+
+
+
+/* Superman-style flying loader override */
+.game-screen{
+  background:linear-gradient(180deg,#bfdbfe 0%,#dbeafe 45%,#eff6ff 100%);
+}
+.game-ground,.ground-dash,.game-obstacle{display:none!important;}
+.runner-wrap{
+  left:72px!important;
+  bottom:48px!important;
+  width:118px!important;
+  height:74px!important;
+  animation:superFly 1.25s ease-in-out infinite!important;
+  transform-origin:center center;
+}
+.runner-shadow{
+  left:-28px!important;
+  bottom:24px!important;
+  width:88px!important;
+  height:16px!important;
+  background:linear-gradient(90deg,rgba(239,68,68,.0),rgba(239,68,68,.22),rgba(37,99,235,.10),rgba(15,23,42,0))!important;
+  filter:blur(2px);
+  animation:heroTrail 1.25s ease-in-out infinite!important;
+}
+.runner-character{
+  position:absolute!important;
+  inset:0!important;
+  transform:rotate(-8deg);
+}
+.runner-character:before{
+  content:"";
+  position:absolute;
+  left:40px;
+  top:34px;
+  width:66px;
+  height:44px;
+  background:linear-gradient(135deg,#dc2626,#991b1b);
+  clip-path:polygon(0 0,100% 18%,82% 100%,8% 72%);
+  border:3px solid #0f172a;
+  border-left:0;
+  border-radius:6px 18px 18px 10px;
+  z-index:0;
+  animation:capeWave .75s ease-in-out infinite;
+}
+.runner-head{
+  top:8px!important;
+  left:14px!important;
+  width:30px!important;
+  height:30px!important;
+  z-index:4;
+}
+.runner-hair{
+  top:5px!important;
+  left:16px!important;
+  width:28px!important;
+  height:13px!important;
+  z-index:5;
+}
+.runner-face{
+  top:20px!important;
+  left:24px!important;
+  z-index:6;
+}
+.runner-body{
+  top:28px!important;
+  left:41px!important;
+  width:42px!important;
+  height:34px!important;
+  border-radius:14px 18px 14px 14px!important;
+  background:#2563eb!important;
+  z-index:3;
+}
+.runner-body:before{
+  content:"";
+  position:absolute;
+  left:13px;
+  top:-7px;
+  width:15px;
+  height:12px;
+  background:#dc2626;
+  border:2px solid #0f172a;
+  border-radius:0 0 12px 12px;
+}
+.runner-body:after{
+  content:"S";
+  position:absolute;
+  left:10px;
+  top:7px;
+  width:19px;
+  height:17px;
+  line-height:17px;
+  text-align:center;
+  font-size:12px;
+  font-weight:900;
+  color:#dc2626;
+  background:#facc15;
+  border:2px solid #0f172a;
+  border-radius:50%;
+}
+.runner-pack{display:none!important;}
+.runner-arm{
+  top:32px!important;
+  height:9px!important;
+  z-index:4;
+  animation:none!important;
+}
+.runner-arm.arm-left{
+  left:-1px!important;
+  width:42px!important;
+  transform:rotate(-12deg)!important;
+}
+.runner-arm.arm-right{
+  left:72px!important;
+  right:auto!important;
+  width:34px!important;
+  transform:rotate(14deg)!important;
+}
+.runner-leg{
+  top:56px!important;
+  height:13px!important;
+  width:30px!important;
+  background:#dc2626!important;
+  border:3px solid #0f172a!important;
+  z-index:2;
+  animation:none!important;
+}
+.runner-leg.leg-left{
+  left:49px!important;
+  transform:rotate(-8deg)!important;
+}
+.runner-leg.leg-right{
+  right:10px!important;
+  transform:rotate(10deg)!important;
+}
+.game-message{color:#1e3a8a!important;}
+@keyframes superFly{
+  0%,100%{transform:translateY(0) rotate(-4deg)}
+  50%{transform:translateY(-12px) rotate(-8deg)}
+}
+@keyframes heroTrail{
+  0%,100%{transform:scaleX(1);opacity:.55}
+  50%{transform:scaleX(1.25);opacity:.28}
+}
+@keyframes capeWave{
+  0%,100%{transform:skewY(0deg) translateY(0)}
+  50%{transform:skewY(-8deg) translateY(3px)}
+}
+@media(max-width:750px){
+  .runner-wrap{left:34px!important;bottom:42px!important;transform:scale(.86)!important;}
+}
+
+
+
+/* Proper free generic superhero loader - no trademarked Superman assets */
+.runner-wrap{display:none!important;}
+.hero-wrap{
+  position:absolute;
+  left:78px;
+  top:58px;
+  width:172px;
+  height:86px;
+  z-index:5;
+  animation:heroFlight 1.35s ease-in-out infinite;
+  filter:drop-shadow(0 10px 14px rgba(15,23,42,.20));
+}
+.hero-svg{width:100%;height:100%;overflow:visible;}
+.hero-cape{animation:capePulse .78s ease-in-out infinite;transform-origin:96px 50px;}
+.hero-arm-front{animation:armPunch .9s ease-in-out infinite;transform-origin:77px 34px;}
+.hero-trail{
+  position:absolute;
+  left:-72px;
+  top:31px;
+  width:92px;
+  height:18px;
+  border-radius:999px;
+  background:linear-gradient(90deg,rgba(239,68,68,0),rgba(239,68,68,.36),rgba(37,99,235,.18),rgba(37,99,235,0));
+  filter:blur(3px);
+  animation:trailPulse 1.35s ease-in-out infinite;
+}
+.hero-nameplate{
+  position:absolute;
+  left:18px;
+  top:-16px;
+  background:rgba(255,255,255,.88);
+  border:1px solid #bfdbfe;
+  color:#1e3a8a;
+  padding:4px 9px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.3px;
+  box-shadow:0 4px 10px rgba(15,23,42,.08);
+}
+@keyframes heroFlight{
+  0%,100%{transform:translateY(0) rotate(-3deg)}
+  50%{transform:translateY(-13px) rotate(-7deg)}
+}
+@keyframes capePulse{
+  0%,100%{transform:skewX(0deg) translateY(0)}
+  50%{transform:skewX(-9deg) translateY(4px)}
+}
+@keyframes armPunch{
+  0%,100%{transform:rotate(0deg)}
+  50%{transform:rotate(-5deg)}
+}
+@keyframes trailPulse{
+  0%,100%{transform:scaleX(1);opacity:.65}
+  50%{transform:scaleX(1.28);opacity:.32}
+}
+@media(max-width:750px){.hero-wrap{left:28px;top:76px;width:146px;height:74px}.hero-nameplate{display:none}}
+
+.other-main-row{cursor:pointer;background:#fff7ed;font-weight:900}
+.other-main-row:hover{background:#ffedd5!important}
+.other-detail-row{background:#fffbeb;color:#475569}
+.other-detail-row td:first-child{padding-left:28px;text-align:left;font-weight:800}
+.other-toggle{display:inline-block;min-width:18px;margin-right:6px;color:#9a3412;font-weight:900}
+.other-note{font-size:10px;color:#9a3412;font-weight:900;margin-left:6px}
+
+.summary-controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:end}.summary-controls label{flex:1;min-width:160px;font-size:11px;font-weight:900;color:#475569}.summary-controls select{display:block;width:100%;margin-top:5px;padding:9px;border:1px solid #cbd5e1;border-radius:9px;background:white;color:#1f2937;font-weight:700}.tracker-actions{margin:0 0 14px}.profile-banner{padding:10px 14px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;margin-bottom:14px;font-weight:900;color:#1e40af}</style>
+<style>
+.game-screen.hero-steering .hero-wrap{animation:none!important;left:var(--hero-x)!important;top:var(--hero-y)!important;transform:rotate(var(--hero-tilt,0deg));transition:left 90ms linear,top 90ms linear,transform 120ms ease-out;pointer-events:none;}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="brand-row">
+    <img class="logo" src="https://i.ibb.co/Lhv3KgtG/Screenshot-2026-11-05-150151.png" alt="Logo">
+    <div><h1>LIA Project Dashboard</h1></div>
+  </div>
+  <div class="top-actions">
+    <button class="top-btn orange" onclick="downloadTodayDump()">Download Today's Dump</button>
+    <button class="top-btn green" onclick="downloadCounterDump()">Download Counter Dump</button>
+  </div>
+</div>
+
+<div class="container"><div id="profileBanner" class="profile-banner" style="display:none"></div>
+  <div id="loading" class="loading">
+<div id="skyGame" style="max-width:850px;margin:0 auto 12px;text-align:center">
+<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:8px 0;color:#1e40af"><b>DATA HERO: JUMP RUN</b><span>Score <b id="skyScore">0</b> | Best <b id="skyBest">0</b></span></div>
+<div id="skyArena" style="position:relative;overflow:hidden;border-radius:14px;border:1px solid #93c5fd;touch-action:none;aspect-ratio:  3 / 1;min-height:180px;background:#dbeafe">
+<canvas id="skyCanvas" width="840" height="280" style="width:100%;height:100%;position:absolute;inset:0"></canvas>
+<div id="skyHero" style="position:absolute;width:12%;height:22%;pointer-events:none"><svg style="width:100%;height:100%;overflow:visible" viewBox="0 0 100 100" role="img" aria-label="Superhero facing right">
+<path d="M43 32 Q22 34 7 63 L39 57 L28 83 Q49 68 56 42Z" fill="#dc2626" stroke="#991b1b" stroke-width="2"/>
+<path d="M47 56 L65 72 L80 78 M46 57 L38 76 L24 88" fill="none" stroke="#1d4ed8" stroke-width="13" stroke-linecap="round"/>
+<path d="M72 75 L84 81 M32 81 L22 90" stroke="#dc2626" stroke-width="12" stroke-linecap="round"/>
+<path d="M44 30 Q61 27 65 44 L59 61 L39 57 L36 43Z" fill="#2563eb" stroke="#172554" stroke-width="2"/>
+<path d="M57 36 L72 46 L85 36" fill="none" stroke="#2563eb" stroke-width="10" stroke-linecap="round"/><circle cx="86" cy="35" r="6" fill="#f6c28b"/>
+<path d="M40 40 L52 49 L35 57" fill="none" stroke="#1d4ed8" stroke-width="9" stroke-linecap="round"/>
+<path d="M40 55 L60 59" stroke="#facc15" stroke-width="5"/>
+<path d="M48 36 L60 38 L54 49 L44 40Z" fill="#facc15"/><text x="53" y="43" text-anchor="middle" font-size="8" font-weight="bold" fill="#dc2626">S</text>
+<path d="M46 12 Q62 5 71 18 L71 23 L77 28 L71 31 Q70 40 58 38 Q45 36 44 24Z" fill="#f6c28b" stroke="#172554" stroke-width="2"/>
+<path d="M44 25 Q37 8 54 6 Q71 3 73 17 L63 15 L57 23 L54 16 L47 26Z" fill="#111827"/><circle cx="67" cy="23" r="2" fill="#111827"/>
+</svg></div>
+<div id="skyOverlay" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#eff6ffbb"><button id="skyStart" type="button" style="background:#1d4ed8;color:white;border:0;border-radius:20px;padding:12px 24px;font-weight:bold;cursor:pointer" disabled>3</button></div></div>
+<div style="font-size:12px;color:#475569;margin-top:7px">Click to jump · Tap or press Space / ↑ · Dodge obstacles and collect coins</div></div>
+    <div class="loading-title">LIA Project Dashboard</div>
+    <div class="loading-subtitle"></div>
+    <div id="loadingStage" style="font-size:16px;font-weight:800;margin-bottom:8px;color:#374151;">Please Wait Connecting with Database...</div>
+    <div class="loading-dots"><span></span><span></span><span></span></div>
+    <div id="loadingPercent" style="font-size:32px;font-weight:900;color:#16a34a;margin-bottom:10px;">0%</div>
+    <div class="loading-bar-wrap"><div id="loadingBar"></div></div>
+    <div class="loading-tip"></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="panel">
+      <h2>Overall KPI</h2>
+      <div class="cards kpi-cards">
+        <div class="card purple"><h3 id="overallTotal">0</h3><p>Total Institutions</p></div>
+        <div class="card green"><h3 id="overallVerified">0</h3><p>Verified</p></div>
+        <div class="card orange"><h3 id="overallUnverified">0</h3><p>Unverified</p></div>
+        <div class="card green"><h3 id="overallEntryAllowed">0</h3><p>Entry Allowed</p></div>
+        <div class="card red"><h3 id="overallEntryNotAllowed">0</h3><p>Entry Not Allowed</p></div>
+        <div class="card purple"><h3 id="overallCounters">0</h3><p>Total Counters</p></div>
+        <div class="card blue"><h3 id="overallOrderValue">0</h3><p>Order Value</p></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Today's KPI</h2>
+      <div class="cards kpi-cards">
+        <div class="card purple"><h3 id="todayTotal">0</h3><p>Institutions Submitted</p></div>
+        <div class="card green"><h3 id="todayVerified">0</h3><p>Verified</p></div>
+        <div class="card orange"><h3 id="todayUnverified">0</h3><p>Unverified</p></div>
+        <div class="card green"><h3 id="todayEntryAllowed">0</h3><p>Entry Allowed</p></div>
+        <div class="card red"><h3 id="todayEntryNotAllowed">0</h3><p>Entry Not Allowed</p></div>
+        <div class="card purple"><h3 id="todayCounters">0</h3><p>Total Counters</p></div>
+        <div class="card blue"><h3 id="todayOrderValue">0</h3><p>Order Value</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="box"><h2>Overall SDE Summary</h2><div class="summary-controls"><label>Sort by <select id="sdeSort" onchange="renderSummaries()"><option value="verified:desc">Verified: High to Low</option><option value="verified:asc">Verified: Low to High</option><option value="counters:desc">Counters: High to Low</option><option value="counters:asc">Counters: Low to High</option><option value="orderValue:desc">Order Value: High to Low</option><option value="orderValue:asc">Order Value: Low to High</option></select></label><label>Select SDE to see profile <select id="profileSde" onchange="changeProfile()"><option value="all">All SDEs</option></select></label></div><div class="table-wrap"><table class="summary-table"><thead><tr><th>SDE Name</th><th>Total</th><th>Verified</th><th>Unverified</th><th>Entry Allowed</th><th>Counters</th><th>Order Value</th></tr></thead><tbody id="overallSdeTable"></tbody></table></div></div>
+    <div class="box"><h2>Today's SDE Summary</h2><div class="table-wrap"><table class="summary-table"><thead><tr><th>SDE Name</th><th>Total</th><th>Verified</th><th>Unverified</th><th>Entry Allowed</th><th>Counters</th><th>Order Value</th></tr></thead><tbody id="todaySdeTable"></tbody></table></div></div>
+  </div>
+
+  <div class="box"><h2 id="institutionTrackerTitle">Monthwise Verified Institution Tracker</h2><div class="filter-actions tracker-actions"><button id="institutionMonth" class="filter-btn active" onclick="setTrackerMode('institution','month')">Monthwise</button><button id="institutionDate" class="filter-btn" onclick="setTrackerMode('institution','date')">Datewise</button></div><div class="tracker-chart-wrap"><canvas id="institutionDateChart"></canvas></div></div>
+  <div class="box"><h2 id="counterTrackerTitle">Monthwise Counter Tracker</h2><div class="filter-actions tracker-actions"><button id="counterMonth" class="filter-btn active" onclick="setTrackerMode('counter','month')">Monthwise</button><button id="counterDate" class="filter-btn" onclick="setTrackerMode('counter','date')">Datewise</button></div><div class="tracker-chart-wrap"><canvas id="counterDateChart"></canvas></div></div>
+
+  <div class="grid-2">
+    <div class="box"><h2>Overall Institution Type Summary</h2><div class="table-wrap"><table class="summary-table"><thead><tr><th>Institution Type</th><th>Total</th><th>Verified</th><th>Unverified</th><th>Entry Allowed</th><th>Counters</th><th>Order Value</th></tr></thead><tbody id="overallTypeTable"></tbody></table></div></div>
+    <div class="box"><h2>Today's Institution Type Summary</h2><div class="table-wrap"><table class="summary-table"><thead><tr><th>Institution Type</th><th>Total</th><th>Verified</th><th>Unverified</th><th>Entry Allowed</th><th>Counters</th><th>Order Value</th></tr></thead><tbody id="todayTypeTable"></tbody></table></div></div>
+  </div>
+
+  <div class="box">
+    <h2>Institution Map</h2>
+    <div class="map-legend"><div class="legend-item"><span class="dot dot-green"></span> Verified</div><div class="legend-item"><span class="dot dot-gray"></span> Unverified</div><div class="legend-item"><span class="dot dot-orange"></span> Entry Not Allowed</div></div>
+    <div class="filter-actions"><button class="filter-btn" id="mapAll" onclick="setMapFilter('all')">All</button><button class="filter-btn green active" id="mapVerified" onclick="setMapFilter('verified')">Verified</button><button class="filter-btn orange" id="mapToday" onclick="setMapFilter('today')">Today's</button></div>
+    <div id="map"></div>
+  </div>
+
+  <div class="box">
+    <h2>Institution Detail Table</h2>
+    <div class="filters">
+      <select id="regionFilter" onchange="applyFilters()"><option value="all">All Regions</option></select>
+      <select id="stateFilter" onchange="applyFilters()"><option value="all">All States</option></select>
+      <select id="districtFilter" onchange="applyFilters()"><option value="all">All Districts</option></select>
+      <select id="typeFilter" onchange="applyFilters()"><option value="all">All Institution Types</option></select>
+      <select id="sdeFilter" onchange="applyFilters()"><option value="all">All SDE</option></select>
+      <input id="searchBox" placeholder="Search institution / audit ID / pincode" oninput="applyFilters()">
+    </div>
+    <div class="filter-actions"><button class="filter-btn green active" id="tableVerifiedPhoto" onclick="setTableMode('verifiedPhoto')">Verified With Photos</button><button class="filter-btn orange" id="tableUnverified" onclick="setTableMode('unverified')">Unverified</button><button class="filter-btn gray" id="tableAll" onclick="setTableMode('all')">All List</button><button class="filter-btn" onclick="resetFilters()">Reset Filters</button></div>
+    <div class="table-wrap"><table class="detail-table"><thead><tr><th>Institution Photo</th><th>Institution</th><th>Region</th><th>State</th><th>District</th><th>Type</th><th>Pincode</th><th>SDE</th><th>Verified</th><th>Institution Open</th><th>Submission Time</th><th>Visit_Date</th><th>Entry Allowed</th><th>Main MRP</th><th>Main Counters</th><th>Main Order Value</th><th>Opposite MRP</th><th>Opposite Counters</th><th>Opposite Order Value</th><th>Total Counters</th><th>Total Order Value</th><th>Valid Phone Count</th><th>Invalid Phone Count</th><th>Visit Status</th><th>Remarks</th></tr></thead><tbody id="institutionTable"></tbody></table></div>
+    <div id="tablePager" class="pager"></div>
+  </div>
+
+  <div class="box"><h2>Institution + Counter View <span class="muted">(Verified only)</span></h2><div id="institutionCounterCards"></div></div>
+</div>
+
+<div id="imageModal" class="modal" onclick="closeImage()"><span class="close">&times;</span><img id="modalImage"></div>
+
+<script>
+const SHEET_ID="1QTSojh8sj91-e59wo4jiBXf8fNA44pvNnjyyzh7ML5Y";
+const SDE_SHEET_NAMES=[
+  "Pandi selvi",
+  "Rameshkumar",
+  "Sanjeev Kumar",
+  "Satyajit Das",
+  "Praveen Raj",
+  "Ijaj Ahmad",
+  "Arul Amrutham",
+  "Anand Mohan Singh",
+  "Abhishek",
+  "Saroj Yadav",
+  "Siva Naga Kumar",
+  "Kalyan Babu",
+  "Sridhar R",
+  "Balaji K",
+  "Ragavan M",
+  "Ghanshyam Kumar",
+  "Ganesh Baikar",
+  "Shakeel Ansari",
+  "Tainur Shaikh",
+  "Vivek Harsh",
+  "Ashish Shukla",
+  "Gaurav Maheshwari",
+  "Mahesh",
+  "Niraj Sharma",
+  "Shital Kakade",
+  "Gurpreet Singh",
+  "Narmada Jaiswal",
+  "Rahul Mewada",
+  "Rahul",
+  "Samarth"
+];
+const SHEETS=[
+  ...SDE_SHEET_NAMES.map(name=>({name:name,alias:"Institution_Master",sourceSheet:name})),
+  {name:"Output",alias:"Output",gid:"2043922333"},
+  {name:"New_Institutions",alias:"New_Institutions"},
+  {name:"MRP_Counters",alias:"MRP_Counters"},
+  {name:"Opposite_MRP_Counters",alias:"Opposite_MRP_Counters"}
+];
+let loadedSheets={},loadIndex=0,currentScript=null,allRows=[],filteredRows=[],tableMode="verifiedPhoto",mapFilter="verified",map,mapMarkers=[],institutionDateChart=null,counterDateChart=null;
+let typeOtherExpanded={overallTypeTable:false,todayTypeTable:false};
+const TABLE_PAGE_SIZE=100, MAP_POINT_LIMIT=1500, COUNTER_CARD_LIMIT=150;let currentPage=1;
+function updateLoading(percent,stage){setHtml("loadingPercent",percent+"%");setHtml("loadingStage",stage);const b=document.getElementById("loadingBar");if(b)b.style.width=percent+"%";}
+
+window.onload=()=>loadAllSheets();
+function loadAllSheets(){document.getElementById("loading").style.display="block";updateLoading(1,"Initializing Dashboard");loadedSheets={};loadIndex=0;loadNextSheet()}
+function appendLoadedSheet(alias,rows){if(!loadedSheets[alias])loadedSheets[alias]=[];loadedSheets[alias]=loadedSheets[alias].concat(rows||[])}
+function loadingProgress(){return Math.min(95,Math.round(((loadIndex+1)/SHEETS.length)*95))}
+function loadNextSheet(){if(loadIndex>=SHEETS.length){mergeSheets();document.getElementById("loading").style.display="none";renderAll();return}const sh=SHEETS[loadIndex];if(currentScript)currentScript.remove();const target=sh.gid?("gid="+encodeURIComponent(sh.gid)):("sheet="+encodeURIComponent(sh.name));const url="https://docs.google.com/spreadsheets/d/"+SHEET_ID+"/gviz/tq?"+target+"&tqx=responseHandler:handleSheetData&cacheBust="+Date.now();currentScript=document.createElement("script");currentScript.src=url;currentScript.onerror=function(){appendLoadedSheet(sh.alias||sh.name,[]);updateLoading(loadingProgress(),"Skipped / could not load: "+(sh.sourceSheet||sh.name));loadIndex++;loadNextSheet()};document.body.appendChild(currentScript)}
+function handleSheetData(response){const sh=SHEETS[loadIndex];appendLoadedSheet(sh.alias||sh.name,parseGvizRows(response));updateLoading(loadingProgress(),(sh.sourceSheet||sh.alias||sh.name)+" Loaded");loadIndex++;setTimeout(loadNextSheet,100)}
+function parseGvizRows(response){const rows=response.table.rows||[],headers=(response.table.cols||[]).map(c=>c.label||c.id||"");return rows.map((r,rowIndex)=>{const obj={_rowIndex:rowIndex};(r.c||[]).forEach((cell,i)=>{const header=headers[i]||("COL"+i);let value="";if(cell)value=cell.f!==undefined&&cell.f!==null&&cell.f!==""?cell.f:(cell.v!==undefined&&cell.v!==null?cell.v:"");obj[header]=value});return obj}).filter(r=>Object.values(r).some(v=>String(v||"").trim()!==""))}
+function mergeSheets(){const master=loadedSheets.Institution_Master||[],output=loadedSheets.Output||[],newInst=loadedSheets.New_Institutions||[],mainCounterRows=loadedSheets.MRP_Counters||[],oppositeCounterRows=loadedSheets.Opposite_MRP_Counters||[];const rows=[];master.forEach(r=>rows.push(normalizeRow(r,"Master")));newInst.forEach(r=>rows.push(normalizeRow(r,"New_Institution")));output.forEach(r=>rows.push(normalizeRow(r,"Output")));allRows=dedupeRows(rows);const byAudit={};allRows.forEach(r=>{if(r.auditId)byAudit[normalizeKey(r.auditId)]=r});const addCounterSheetRows=(sheetRows,side)=>{sheetRows.forEach(cr=>{const aid=pick(cr,["Audit_ID","Audit ID"]);if(!aid)return;const key=normalizeKey(aid);let inst=byAudit[key];if(!inst){inst=normalizeRow(cr,"Counter_Only");inst.verified="Yes";inst.auditId=aid;inst.mainCounters=[];inst.oppositeCounters=[];inst.counters=[];allRows.push(inst);byAudit[key]=inst}const c=parseCounterSheetRow(cr,side);if(!c.outletName&&!c.rawPhone&&!c.photo&&!c.counterStatus&&!c.orderValue)return;const target=side==="Opposite"?inst.oppositeCounters:inst.mainCounters;const ckey=[c.side,c.counterNo,c.outletName,c.rawPhone,c.photo,c.orderValue].map(normalizeKey).join("|");if(!target.some(x=>[x.side,x.counterNo,x.outletName,x.rawPhone,x.photo,x.orderValue].map(normalizeKey).join("|")===ckey))target.push(c);inst.counters=inst.mainCounters.concat(inst.oppositeCounters)})};addCounterSheetRows(mainCounterRows,"Main");addCounterSheetRows(oppositeCounterRows,"Opposite");allRows=dedupeRows(allRows)}
+function dedupeRows(rows){const byKey={};rows.forEach(r=>{const key=r.auditId?"audit:"+normalizeKey(r.auditId):"inst:"+[r.institutionName,r.district,r.pincode,r.sde].map(normalizeKey).join("|");if(!key.replace(/audit:|inst:|\|/g,"").trim())return;const existing=byKey[key];if(!existing||rowCompletenessScore(r)>rowCompletenessScore(existing))byKey[key]=r});let out=Object.values(byKey);const verifiedCombos=new Set(out.filter(r=>r.sourceType!=="New_Institution"&&isVerified(r)).map(r=>[r.institutionName,r.district,r.pincode,r.sde].map(normalizeKey).join("|")));out=out.filter(r=>!(r.sourceType==="New_Institution"&&verifiedCombos.has([r.institutionName,r.district,r.pincode,r.sde].map(normalizeKey).join("|"))));return out}
+function rowCompletenessScore(r){return (isVerified(r)?10000:0)+(r.sourceType==="Output"?5000:0)+(hasPhoto(r)?100:0)+(r.counters?r.counters.length*30:0)+(totalOrderValue(r)>0?50:0)+(r.auditId?10:0)+(r.visitDate?5:0)+(r.submissionTime?2:0)}
+function normalizeRow(r,sourceType=""){const row={raw:r,sourceType};row.region=pick(r,["Region"]);row.state=pick(r,["State"]);row.district=pick(r,["District"]);row.institutionType=getInstitutionTypeValue(r);row.institutionName=pick(r,["Institution Name","Institution_Name"]);row.pincode=pick(r,["Pincode","Pin Code"]);row.lat=pick(r,["Lat","Latitude"]);row.long=pick(r,["Long","Lng","Longitude"]);row.sde=pick(r,["SDE Name","SDE_Name","SDE"]);row.verified=pick(r,["Verified"]);if(sourceType==="Output"||sourceType==="Counter_Only")row.verified=row.verified||"Yes";row.auditId=pick(r,["Audit_ID","Audit ID","New_Institution_ID","New Institution ID"]);row.submissionTime=pick(r,["Submission_Time","Submission Time","Timestamp","Saved_Time","Output_Appended_Time","Created_Time"]);row.createdTime=pick(r,["Created_Time","Created Time"]);row.createdDate=pick(r,["Created_Date","Created Date"]);row.liveLat=pick(r,["Live_Lat","Live Lat"]);row.liveLong=pick(r,["Live_Long","Live Long"]);row.distance=pick(r,["Distance"]);row.institutionPhoto=pick(r,["Institution_Photo_Link","Institution Photo Link","Institution Photo","Photo"]);row.institutionOpenStatus=pick(r,["Institution_Open_Status","Institution Open Status"]);row.entryAllowed=pick(r,["Entry_Allowed","Entry Allowed"]);row.entryNotAllowedReason=pick(r,["Entry_Not_Allowed_Reason","Entry Not Allowed Reason"]);row.mrpCounterAvailability=pick(r,["MRP_Counter_Availability","Main_MRP_Counter_Availability","MRP Counter Availability"]);row.mrpCounterAvailabilityOpposite=pick(r,["MRP_Counter_Availability_Opposite_Institution","Opposite_MRP_Counter_Availability","Opposite MRP Counter Availability"]);row.numberOfCounters=pick(r,["Number_of_Counters","Number of Counters"]);row.numberOfOppositeCounters=pick(r,["Number_of_Opposite_Counters","Number of Opposite Counters"]);row.counterJson=pick(r,["Counter_Details_JSON","Counter Details JSON"]);row.counterSummary=pick(r,["Counter_Details_Summary","Counter Details Summary"]);row.oppositeCounterJson=pick(r,["Opposite_Counter_Details_JSON","Opposite Counter Details JSON"]);row.oppositeCounterSummary=pick(r,["Opposite_Counter_Details_Summary","Opposite Counter Details Summary"]);row.visitStatus=pick(r,["Visit_Status","Visit Status","Counter_Visit_Status","Counter Visit Status"]);row.remarks=pick(r,["Remarks"]);row.visitDate=pick(r,["Visit_Date","Visit Date","VisitDate"]);row.date=row.visitDate||row.createdDate||pick(r,["Date","Audit Date","Date_Correct","Date Correct"]);row.mainCounters=parseCounters(row,"Main");row.oppositeCounters=parseCountersFrom(row.oppositeCounterJson,row.oppositeCounterSummary,"Opposite");row.counters=row.mainCounters.concat(row.oppositeCounters);return row}
+function parseCounterSheetRow(r,side){return {side:side,counterNo:pick(r,["Counter_No","Counter No","counterNo"]),outletName:pick(r,["Outlet_Name","Outlet Name","outletName"]),phone:validPhone(pick(r,["Owner_Contact_Number","Owner Contact Number","ownerContactNumber"])),rawPhone:pick(r,["Owner_Contact_Number","Owner Contact Number","ownerContactNumber"]),visiCoolerDoors:pick(r,["Number_of_Visi_Cooler_Doors","Number of Visi Cooler Doors","visiCoolerDoors"]),counterStatus:pick(r,["Counter_Status","Counter Status"]),counterVisitStatus:pick(r,["Counter_Visit_Status","Counter Visit Status","Visit_Status","Visit Status"]),ownershipType:pick(r,["Ownership_Type","Ownership Type","ownershipType"]),photo:pick(r,["Outlet_Photo_Link","Outlet Photo Link","outletPhotoLink"]),orderValue:parseOrderValue(pick(r,["Order_Value","Order Value","OrderValue","orderValue","Order_Value_Rs","Order Value Rs","Order Amount","Amount","Value","Order"]))}}
+function parseCounters(row,side="Main"){return parseCountersFrom(row.counterJson,row.counterSummary,side)}
+function parseCountersFrom(counterJson,counterSummary,side="Main"){let counters=[];if(counterJson){try{const parsed=JSON.parse(counterJson);if(Array.isArray(parsed))counters=parsed.map((c,i)=>({side:side,counterNo:c.counterNo||c.counter_no||i+1,outletName:c.outletName||c.outlet_name||"",phone:validPhone(c.ownerContactNumber||c.phone||c.contact||""),rawPhone:String(c.ownerContactNumber||c.phone||c.contact||""),visiCoolerDoors:c.visiCoolerDoors||c.numberOfVisiCoolerDoors||"",counterStatus:c.counterStatus||"",counterVisitStatus:c.counterVisitStatus||c.visitStatus||"",ownershipType:c.ownershipType||c.ownership_type||"",photo:c.outletPhotoLink||c.photo||c.photoLink||"",orderValue:parseOrderValue(c.orderValue||c.order_value||c.orderAmount||c.amount||c.value||"")}))}catch(e){}}
+if(counters.length===0&&counterSummary){const parts=String(counterSummary).split(/\|\| |\|\||\n|;/).filter(Boolean);parts.forEach((p,i)=>{const bits=p.split("|").map(x=>x.trim());const photo=bits.find(x=>String(x).includes("drive.google.com"))||"";const phone=bits.find(x=>/\d{10}/.test(String(x).replace(/\D/g,"")))||"";const orderText=bits.find(x=>/order|amount|value|rs\.?|inr|₹/i.test(String(x)))||"";counters.push({side:side,counterNo:(bits[0]||i+1).replace(/^Counter\s*/i,""),outletName:bits[1]||"",phone:validPhone(phone),rawPhone:phone,visiCoolerDoors:(bits.find(x=>/visi/i.test(x))||"").replace(/.*?:/,"").trim(),counterStatus:(bits.find(x=>/^Status:/i.test(x))||"").replace(/Status:/i,"").trim(),counterVisitStatus:(bits.find(x=>/^Visit:/i.test(x))||"").replace(/Visit:/i,"").trim(),ownershipType:bits.find(x=>/Admin-run|Individual|Chain/i.test(x))||"",photo:photo,orderValue:parseOrderValue(orderText)})})}return counters}
+function parseOrderValue(v){if(v===null||v===undefined)return 0;let s=String(v).trim();if(isPlaceholderValue(s))return 0;s=s.replace(/,/g,"").replace(/₹/g,"").replace(/rs\.?/ig,"").replace(/inr/ig,"").replace(/[^0-9.\-]/g,"");const n=parseFloat(s);return isNaN(n)?0:n}
+function mainOrderValue(row){return (row.mainCounters||[]).reduce((s,c)=>s+Number(c.orderValue||0),0)}function oppositeOrderValue(row){return (row.oppositeCounters||[]).reduce((s,c)=>s+Number(c.orderValue||0),0)}function totalOrderValue(row){return mainOrderValue(row)+oppositeOrderValue(row)}function rowsOrderValue(rows){return rows.reduce((s,r)=>s+totalOrderValue(r),0)}function formatMoney(n){n=Number(n||0);return n.toLocaleString("en-IN",{maximumFractionDigits:0})}
+function isPlaceholderValue(v){const s=String(v??"").trim().toLowerCase();return s===""||s==="#n/a"||s==="n/a"||s==="na"||s==="#na"||s==="null"||s==="undefined"||s==="#value!"||s==="#ref!"||s==="-"}function pickExact(obj,names){for(const n of names){const key=Object.keys(obj).find(k=>String(k||"").trim().toLowerCase()===String(n||"").trim().toLowerCase());if(key!==undefined){const v=String(obj[key]??"").trim();if(!isPlaceholderValue(v))return v}}return""}
+const CANONICAL_INSTITUTION_TYPES=["College","Sports","Hospitals","Work Places","School","Hotels"];
+function rawInstitutionTypeValue(obj){return pickExact(obj,["Institution Type"])||pick(obj,["Institution Type","Institution_Type","InstitutionType","Institute Type","Type of Institution","Institution Category","Type"])}
+function cleanInstitutionTypeText(v){return String(v||"").trim().replace(/\s+/g," ")}
+function normalizeInstitutionTypeValue(v){
+  const raw=cleanInstitutionTypeText(v);
+  if(!raw)return"";
+  const k=raw.toLowerCase();
+  const compact=k.replace(/[^a-z0-9]/g,"");
+
+  // Expanded keyword-based canonicalization. If a known category keyword is found,
+  // map to the fixed bucket. If not found, keep the entered value as a new type.
+  // Order matters: education/work/food overlap is handled deliberately.
+
+  // Hospitals / healthcare misspellings
+  if(/hospital/.test(k)||/hispital/.test(k)||/hosp/.test(k)||/clinic/.test(k)||/medical/.test(k)||/health/.test(k))return"Hospitals";
+
+  // Sports / outdoor activity
+  if(/sport/.test(k)||/turf/.test(k)||/stadium/.test(k)||/sports club/.test(k)||/playground/.test(k)||/gym/.test(k))return"Sports";
+
+  // Schools / school-board spelling variants
+  if(/school/.test(k)||/cbse/.test(k)||/cbsc/.test(k)||/primary/.test(k)||/secondary/.test(k)||/higher secondary/.test(k))return"School";
+
+  // Colleges / broader education institutions
+  if(/college/.test(k)||/colleg/.test(k)||/coll\d*/.test(k)||/university/.test(k)||/institute/.test(k)||/institution/.test(k)||/education/.test(k)||/library/.test(k)||/coaching/.test(k)||/coching/.test(k)||/training/.test(k)||/academy/.test(k)||/skill/.test(k)||compact.includes("colleg")||compact.includes("coll"))return"College";
+
+  // Hotels / hospitality and food-service misspellings
+  if(/hotel/.test(k)||/hotal/.test(k)||/bakery/.test(k)||/canteen/.test(k)||/cater/.test(k)||/catres/.test(k)||/parlour/.test(k)||/parlor/.test(k))return"Hotels";
+
+  // Work places / offices / transport / industrial and tech locations
+  if(/work/.test(k)||/office/.test(k)||/corporate/.test(k)||/industrial/.test(k)||/factory/.test(k)||/company/.test(k)||/software/.test(k)||/^it$/.test(k)||/egl/.test(k)||/dmrc/.test(k)||/rail/.test(k)||/relway/.test(k)||/metro/.test(k)||/bus stand/.test(k)||/petrol pump/.test(k)||/army/.test(k)||/tourist/.test(k)||/travel/.test(k)||/core/.test(k))return"Work Places";
+
+  // Entertainment locations
+  if(/cinema/.test(k)||/theatre/.test(k)||/theater/.test(k)||/multiplex/.test(k)||/cinepolis/.test(k)||/entertainment/.test(k)||/intertanment/.test(k))return"Work Places";
+
+  return raw;
+}
+function getInstitutionTypeValue(obj){return normalizeInstitutionTypeValue(rawInstitutionTypeValue(obj))}
+function summaryInstitutionType(row){return normalizeInstitutionTypeValue(rawInstitutionTypeValue(row.raw||{})||row.institutionType)||"Type Not Available"}
+function pick(obj,names){for(const n of names){const key=Object.keys(obj).find(k=>norm(k)===norm(n));if(key!==undefined){const v=String(obj[key]??"").trim();if(!isPlaceholderValue(v))return v}}return""}function norm(v){return String(v||"").toLowerCase().replace(/[^a-z0-9]/g,"")}function normalizeKey(v){return String(v||"").toLowerCase().replace(/\s+/g,"").trim()}
+function validPhone(v){const digits=String(v||"").replace(/\D/g,"");if(digits.length===10)return digits;if(digits.length>10){const last10=digits.slice(-10);return /^[6-9]\d{9}$/.test(last10)?last10:""}return""}function invalidPhoneCount(row){return row.counters.filter(c=>String(c.rawPhone||"").replace(/\D/g,"").length>0&&!c.phone).length}function validPhoneCount(row){return row.counters.filter(c=>c.phone).length}
+function isYes(v){return ["yes","y","true","1"].includes(String(v||"").toLowerCase().trim())}function isVerified(row){return isYes(row.verified)}function hasPhoto(row){return !!getDriveImage(row.institutionPhoto)}function isEntryAllowed(row){return isYes(row.entryAllowed)}
+function getRowDate(row){if(!isPlaceholderValue(row.visitDate))return parseVisitDateISO(row.visitDate);return parseVisitDateISO(row.date)}function dateKey(d){return d?d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"):""}function formatISODate(d){return d?d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"):""}function makeDate(year,month,day){const d=new Date(year,month-1,day);return d instanceof Date&&!isNaN(d.getTime())&&d.getFullYear()===year&&d.getMonth()===month-1&&d.getDate()===day?d:null}
+function parseVisitDateISO(value){if(isPlaceholderValue(value))return null;const t=String(value||"").trim();const iso=t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s|T|$)/);if(iso)return makeDate(+iso[1],+iso[2],+iso[3]);const g=t.match(/^Date\((\d{4}),\s*(\d{1,2}),\s*(\d{1,2})/);if(g)return makeDate(+g[1],+g[2]+1,+g[3]);const m=t.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})(?:\s|,|$)/);if(m){let a=+m[1],b=+m[2],y=+m[3];if(y<100)y+=2000;return makeDate(y,a,b)||makeDate(y,b,a)}return null}
+function isToday(row){const tKey=dateKey(new Date()),d=getRowDate(row);return d&&dateKey(d)===tKey}
+function latestSortValue(row){const d=getRowDate(row);if(d)return d.getTime();const raw=row.submissionTime||row.createdTime||row.createdDate||row.date||"";const parsed=Date.parse(String(raw).replace(/Date\((\d+),\s*(\d+),\s*(\d+).*\)/,"$1-$2-$3"));return isNaN(parsed)?0:parsed}
+let fullDashboardRows=null,profileName="all";const trackerModes={institution:"month",counter:"month"};
+function profileMatch(name){return profileName==="all"||normalizeKey(name)===normalizeKey(profileName)}
+function changeProfile(){profileName=document.getElementById("profileSde").value;allRows=fullDashboardRows.filter(r=>profileMatch(r.sde));const banner=document.getElementById("profileBanner");banner.style.display=profileName==="all"?"none":"block";banner.textContent="SDE Profile: "+profileName;["regionFilter","stateFilter","districtFilter","typeFilter","sdeFilter"].forEach(id=>document.getElementById(id).value="all");document.getElementById("searchBox").value="";renderAll()}
+function setTrackerMode(kind,mode){trackerModes[kind]=mode;document.getElementById(kind+"Month").classList.toggle("active",mode==="month");document.getElementById(kind+"Date").classList.toggle("active",mode==="date");document.getElementById(kind+"TrackerTitle").textContent=(mode==="month"?"Monthwise ":"Datewise ")+(kind==="institution"?"Verified Institution":"Counter")+" Tracker";renderDateChart()}
+function renderAll(){if(fullDashboardRows===null){fullDashboardRows=allRows.slice();fillSelect("profileSde",unique([...SDE_SHEET_NAMES,...allRows.map(r=>r.sde)]),"All SDEs");}populateFilters();applyFilters();renderKpis();renderSummaries();renderDateChart();renderMap();renderCounterCards()}
+function renderKpis(){renderKpiSet(allRows,"overall");renderKpiSet(allRows.filter(isToday),"today")}function renderKpiSet(rows,prefix){setText(prefix+"Total",rows.length);setText(prefix+"Verified",rows.filter(isVerified).length);setText(prefix+"Unverified",rows.filter(r=>!isVerified(r)).length);setText(prefix+"EntryAllowed",rows.filter(isEntryAllowed).length);setText(prefix+"EntryNotAllowed",rows.filter(r=>String(r.entryAllowed).trim()!==""&&!isEntryAllowed(r)).length);setText(prefix+"Counters",rows.reduce((s,r)=>s+r.counters.length,0));setText(prefix+"OrderValue",formatMoney(rowsOrderValue(rows)))}function setText(id,v){const el=document.getElementById(id);if(el)el.innerText=v}function setHtml(id,v){const el=document.getElementById(id);if(el)el.innerHTML=v}
+function populateFilters(){fillSelect("regionFilter",unique(allRows.map(r=>r.region)),"All Regions");fillSelect("stateFilter",unique(allRows.map(r=>r.state)),"All States");fillSelect("districtFilter",unique(allRows.map(r=>r.district)),"All Districts");fillSelect("typeFilter",unique(allRows.map(r=>r.institutionType)),"All Institution Types");fillSelect("sdeFilter",unique(allRows.map(r=>r.sde)),"All SDE")}function unique(arr){return [...new Set(arr.map(v=>String(v||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b))}function fillSelect(id,values,label){const el=document.getElementById(id),old=el.value;el.innerHTML='<option value="all">'+label+'</option>'+values.map(v=>'<option value="'+safe(v)+'">'+safe(displayLabel(v))+'</option>').join("");if(values.includes(old))el.value=old}
+function applyFilters(){currentPage=1;const rf=val("regionFilter"),sf=val("stateFilter"),df=val("districtFilter"),tf=val("typeFilter"),sdef=val("sdeFilter"),q=String(document.getElementById("searchBox").value||"").toLowerCase().trim();filteredRows=allRows.filter(r=>{if(rf!=="all"&&r.region!==rf)return false;if(sf!=="all"&&r.state!==sf)return false;if(df!=="all"&&r.district!==df)return false;if(tf!=="all"&&r.institutionType!==tf)return false;if(sdef!=="all"&&r.sde!==sdef)return false;if(q){const hay=[r.institutionName,r.auditId,r.pincode,r.district,r.state,r.sde].join(" ").toLowerCase();if(!hay.includes(q))return false}if(tableMode==="verifiedPhoto")return isVerified(r)&&hasPhoto(r);if(tableMode==="unverified")return !isVerified(r);return true}).sort((a,b)=>latestSortValue(b)-latestSortValue(a)||String(b.submissionTime||"").localeCompare(String(a.submissionTime||"")));renderInstitutionTable();renderMap()}function val(id){return document.getElementById(id).value}
+function setTableMode(mode){tableMode=mode;["tableVerifiedPhoto","tableUnverified","tableAll"].forEach(id=>document.getElementById(id).classList.remove("active"));const ids={verifiedPhoto:"tableVerifiedPhoto",unverified:"tableUnverified",all:"tableAll"};document.getElementById(ids[mode]).classList.add("active");applyFilters()}function resetFilters(){["regionFilter","stateFilter","districtFilter","typeFilter","sdeFilter"].forEach(id=>document.getElementById(id).value="all");document.getElementById("searchBox").value="";setTableMode("verifiedPhoto")}
+function renderInstitutionTable(){const total=filteredRows.length,totalPages=Math.max(1,Math.ceil(total/TABLE_PAGE_SIZE));if(currentPage>totalPages)currentPage=totalPages;const start=(currentPage-1)*TABLE_PAGE_SIZE,pageRows=filteredRows.slice(start,start+TABLE_PAGE_SIZE);let html="";pageRows.forEach(r=>{const img=getDriveImage(r.institutionPhoto);html+=`<tr><td>${img?`<img class="photo" loading="lazy" src="${safe(img)}" onclick="openImage('${safeForJs(img)}')">`:'<span class="no-photo">No Photo</span>'}</td><td class="name-cell">${safe(display(r.institutionName))}<div class="muted">${safe(display(r.auditId,"No Audit ID"))} | ${safe(display(r.sourceType,"Master"))}</div></td><td>${safe(display(r.region))}</td><td>${safe(display(r.state))}</td><td>${safe(display(r.district))}</td><td>${safe(display(r.institutionType))}</td><td>${safe(display(r.pincode))}</td><td>${safe(display(r.sde))}</td><td>${yesBadge(isVerified(r))}</td><td>${safe(display(r.institutionOpenStatus))}</td><td>${safe(display(r.submissionTime))}</td><td>${safe(display(r.visitDate||r.date))}</td><td>${yesBadge(isEntryAllowed(r))}</td><td>${yesBadge(isYes(r.mrpCounterAvailability))}</td><td>${r.mainCounters.length||safe(display(r.numberOfCounters,"0"))}</td><td>${formatMoney(mainOrderValue(r))}</td><td>${yesBadge(isYes(r.mrpCounterAvailabilityOpposite))}</td><td>${r.oppositeCounters.length||safe(display(r.numberOfOppositeCounters,"0"))}</td><td>${formatMoney(oppositeOrderValue(r))}</td><td>${r.counters.length}</td><td>${formatMoney(totalOrderValue(r))}</td><td><span class="badge badge-yes">${validPhoneCount(r)}</span></td><td><span class="badge ${invalidPhoneCount(r)>0?'badge-bad':'badge-gray'}">${invalidPhoneCount(r)}</span></td><td>${safe(display(r.visitStatus))}</td><td>${safe(display(r.remarks))}</td></tr>`});if(!html)html='<tr><td colspan="25" style="text-align:center;color:#64748b;font-weight:900;">No institutions found for selected filter</td></tr>';document.getElementById("institutionTable").innerHTML=html;renderTablePager(total,totalPages,start,pageRows.length)}
+function renderTablePager(total,totalPages,start,count){const el=document.getElementById("tablePager");if(!el)return;if(total===0){el.innerHTML="";return}const from=start+1,to=start+count,pages=[];const push=p=>{if(p>=1&&p<=totalPages&&!pages.includes(p))pages.push(p)};push(1);push(currentPage-2);push(currentPage-1);push(currentPage);push(currentPage+1);push(currentPage+2);push(totalPages);pages.sort((a,b)=>a-b);let html=`<span>Showing ${from}-${to} of ${total}. Full counts use all ${allRows.length} rows.</span><button onclick="gotoTablePage(${Math.max(1,currentPage-1)})">Prev</button>`;pages.forEach((p,i)=>{if(i&&p-pages[i-1]>1)html+='<span>...</span>';html+=`<button class="${p===currentPage?'active':''}" onclick="gotoTablePage(${p})">${p}</button>`});html+=`<button onclick="gotoTablePage(${Math.min(totalPages,currentPage+1)})">Next</button>`;el.innerHTML=html}function gotoTablePage(p){currentPage=p;renderInstitutionTable()}
+function renderSummaries(){renderTypeSummary(allRows,"overallTypeTable");renderTypeSummary(allRows.filter(isToday),"todayTypeTable");renderSdeSummary(allRows,"overallSdeTable");renderSdeSummary(allRows.filter(isToday),"todaySdeTable")}
+function blankSummary(){return{total:0,verified:0,unverified:0,entry:0,counters:0,orderValue:0}}
+function addToSummary(x,r){x.total++;if(isVerified(r))x.verified++;else x.unverified++;if(isEntryAllowed(r))x.entry++;x.counters+=r.counters.length;x.orderValue+=totalOrderValue(r)}
+function renderTypeSummary(rows,id){const core={},otherDetails={};CANONICAL_INSTITUTION_TYPES.forEach(k=>core[k]=blankSummary());rows.forEach(r=>{const raw=cleanInstitutionTypeText(rawInstitutionTypeValue(r.raw||{})||r.institutionType)||"Type Not Available";const mapped=normalizeInstitutionTypeValue(raw);if(CANONICAL_INSTITUTION_TYPES.includes(mapped)){addToSummary(core[mapped],r)}else{if(!otherDetails[raw])otherDetails[raw]=blankSummary();addToSummary(otherDetails[raw],r)}});renderTypeSummaryTable(core,otherDetails,id)}
+function isRawOtherTypeLabel(k){const s=cleanInstitutionTypeText(k).toLowerCase();return s==="other"||s==="others"}
+function renderTypeSummaryTable(core,otherDetails,id){let html="";CANONICAL_INSTITUTION_TYPES.forEach(k=>{const x=core[k];if(x.total>0)html+=summaryRowHtml(k,x)});const otherKeys=Object.keys(otherDetails).sort((a,b)=>otherDetails[b].total-otherDetails[a].total||a.localeCompare(b));const visibleOtherKeys=otherKeys.filter(k=>!isRawOtherTypeLabel(k));const other=otherKeys.reduce((a,k)=>mergeSummary(a,otherDetails[k]),blankSummary());if(other.total>0){const expanded=!!typeOtherExpanded[id];const detailCount=visibleOtherKeys.length;html+=`<tr class="other-main-row" onclick="toggleOtherDetails('${id}')"><td><span class="other-toggle">${expanded?'▼':'▶'}</span><b>Other</b><span class="other-note">click to ${expanded?'hide':'show'} ${detailCount} unmatched type${detailCount===1?'':'s'}</span></td><td>${other.total}</td><td>${other.verified}</td><td>${other.unverified}</td><td>${other.entry}</td><td>${other.counters}</td><td>${formatMoney(other.orderValue)}</td></tr>`;if(expanded){visibleOtherKeys.forEach(k=>{const x=otherDetails[k];const label=otherDetailLabel(k);html+=`<tr class="other-detail-row"><td>↳ ${safe(displayLabel(label))}</td><td>${x.total}</td><td>${x.verified}</td><td>${x.unverified}</td><td>${x.entry}</td><td>${x.counters}</td><td>${formatMoney(x.orderValue)}</td></tr>`})}}
+const t=[...Object.values(core),other].reduce((a,x)=>mergeSummary(a,x),blankSummary());if(t.total)html+=`<tr class="summary-row"><td>Total</td><td>${t.total}</td><td>${t.verified}</td><td>${t.unverified}</td><td>${t.entry}</td><td>${t.counters}</td><td>${formatMoney(t.orderValue)}</td></tr>`;if(!html)html='<tr><td colspan="7">No data</td></tr>';document.getElementById(id).innerHTML=html}
+function summaryRowHtml(k,x){return `<tr><td><b>${safe(displayLabel(k))}</b></td><td>${x.total}</td><td>${x.verified}</td><td>${x.unverified}</td><td>${x.entry}</td><td>${x.counters}</td><td>${formatMoney(x.orderValue)}</td></tr>`}
+function mergeSummary(a,x){a.total+=x.total;a.verified+=x.verified;a.unverified+=x.unverified;a.entry+=x.entry;a.counters+=x.counters;a.orderValue+=x.orderValue;return a}
+function otherDetailLabel(k){return cleanInstitutionTypeText(k)||"Type Not Available"}
+function toggleOtherDetails(id){typeOtherExpanded[id]=!typeOtherExpanded[id];renderSummaries()}
+function renderSdeSummary(rows,id){const s={};rows.forEach(r=>{const k=r.sde||"SDE Not Available";if(!s[k])s[k]=blankSummary();addToSummary(s[k],r)});renderSummaryTable(s,id,"sde")}
+function compareSdeSummary(s,a,b){const [key,dir]=document.getElementById("sdeSort").value.split(":");return (dir==="asc"?1:-1)*(s[a][key]-s[b][key])||a.localeCompare(b)}
+function renderSummaryTable(s,id,mode){let html="";Object.keys(s).sort((a,b)=>mode==="sde"?((id==="overallSdeTable"?compareSdeSummary(s,a,b):s[b].verified-s[a].verified||s[b].total-s[a].total||a.localeCompare(b))):(s[b].total-s[a].total||a.localeCompare(b))).forEach(k=>{const x=s[k];html+=summaryRowHtml(k,x)});const t=Object.values(s).reduce((a,x)=>mergeSummary(a,x),blankSummary());if(t.total)html+=`<tr class="summary-row"><td>Total</td><td>${t.total}</td><td>${t.verified}</td><td>${t.unverified}</td><td>${t.entry}</td><td>${t.counters}</td><td>${formatMoney(t.orderValue)}</td></tr>`;if(!html)html='<tr><td colspan="7">No data</td></tr>';document.getElementById(id).innerHTML=html}
+function renderCounterCards(){const box=document.getElementById("institutionCounterCards");let rows=allRows.filter(r=>isVerified(r)&&(r.counters.length>0||hasPhoto(r))).sort((a,b)=>latestSortValue(b)-latestSortValue(a)||String(b.submissionTime||"").localeCompare(String(a.submissionTime||"")));const total=rows.length;rows=rows.slice(0,COUNTER_CARD_LIMIT);let html=total>COUNTER_CARD_LIMIT?`<div class="perf-note">Showing first ${COUNTER_CARD_LIMIT} verified institutions with photos/counters. KPI and summary counts still use all ${allRows.length} rows.</div>`:"";rows.forEach(r=>{const build=(list,title)=>{if(!list.length)return `<div class="counter-card"><h4>${title}</h4><div class="no-photo">No ${title.toLowerCase()} captured</div></div>`;return list.map((c,i)=>{const img=getDriveImage(c.photo);return `<div class="counter-card"><h4>${title} ${safe(display(c.counterNo,i+1))}</h4>${img?`<img class="photo small" loading="lazy" src="${safe(img)}" onclick="openImage('${safeForJs(img)}')">`:'<div class="no-photo">Counter photo not available</div>'}<div><b>Side:</b> ${safe(display(c.side,title))}</div><div><b>Status:</b> ${safe(display(c.counterStatus,"-"))}</div><div><b>Outlet:</b> ${safe(display(c.outletName))}</div><div><b>Order Value:</b> ${formatMoney(c.orderValue)}</div><div><b>Phone:</b> ${c.phone?'<span class="badge badge-yes">'+safe(c.phone)+'</span>':'<span class="badge badge-bad">Invalid / Missing</span>'}</div><div><b>Visi cooler doors:</b> ${safe(display(c.visiCoolerDoors,"0"))}</div><div><b>Visit:</b> ${safe(display(c.counterVisitStatus,"-"))}</div><div><b>Ownership:</b> ${safe(display(c.ownershipType))}</div></div>`}).join("")};html+=`<div class="institution-card"><div class="institution-head"><div><div class="institution-title">${safe(display(r.institutionName))}</div><div class="institution-sub">${safe(display(r.district))} | ${safe(display(r.institutionType))} | ${safe(display(r.auditId,"No Audit ID"))}</div></div><div class="mini-metric"><b>${r.mainCounters.length}</b><span>Main</span></div><div class="mini-metric"><b>${r.oppositeCounters.length}</b><span>Opposite</span></div><div class="mini-metric"><b>${formatMoney(mainOrderValue(r))}</b><span>Main Value</span></div><div class="mini-metric"><b>${formatMoney(oppositeOrderValue(r))}</b><span>Opp Value</span></div><div class="mini-metric"><b>${formatMoney(totalOrderValue(r))}</b><span>Total Value</span></div><div class="mini-metric"><b>${validPhoneCount(r)}</b><span>Valid Phones</span></div></div><div class="counter-grid">${build(r.mainCounters,"Main Counter")+build(r.oppositeCounters,"Opposite Counter")}</div></div>`});box.innerHTML=html||'<div class="no-photo" style="text-align:center;">No verified institution available</div>'}
+function initMap(){if(map)return;map=L.map("map").setView([11.5,78.5],6);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(map)}function setMapFilter(f){mapFilter=f;["mapAll","mapVerified","mapToday"].forEach(id=>document.getElementById(id).classList.remove("active"));({all:"mapAll",verified:"mapVerified",today:"mapToday"}[f]&&document.getElementById({all:"mapAll",verified:"mapVerified",today:"mapToday"}[f]).classList.add("active"));renderMap()}function renderMap(){if(typeof L==="undefined")return;initMap();mapMarkers.forEach(m=>map.removeLayer(m));mapMarkers=[];let rows=[...allRows];if(mapFilter==="verified")rows=rows.filter(isVerified);if(mapFilter==="today")rows=rows.filter(isToday);const totalBeforeCoordinateFilter=rows.length;rows=rows.map(r=>({row:r,coord:getCoords(r)})).filter(x=>x.coord).slice(0,MAP_POINT_LIMIT);const bounds=[];rows.forEach(x=>{const r=x.row,c=x.coord;const cls=!isEntryAllowed(r)&&String(r.entryAllowed).trim()?"entryno":isVerified(r)?"verified":"pending";const icon=L.divIcon({className:"",html:`<div class="map-marker marker-${cls}"></div>`,iconSize:[24,24],iconAnchor:[12,12]});const m=L.marker([c.lat,c.lng],{icon}).addTo(map);m.bindPopup(`<div class="popup-title">${safe(display(r.institutionName))}</div><div><b>Verified:</b> ${isVerified(r)?"Yes":"No"}</div><div><b>Entry Allowed:</b> ${isEntryAllowed(r)?"Yes":"No"}</div><div><b>Counters:</b> ${r.counters.length}</div><div><b>Order Value:</b> ${formatMoney(totalOrderValue(r))}</div><div><b>SDE:</b> ${safe(display(r.sde))}</div><div><b>District:</b> ${safe(display(r.district))}</div>${totalBeforeCoordinateFilter>MAP_POINT_LIMIT?`<div><b>Note:</b> Map capped at ${MAP_POINT_LIMIT} valid coordinate points for speed.</div>`:""}`);mapMarkers.push(m);bounds.push([c.lat,c.lng])});setTimeout(()=>{map.invalidateSize();if(bounds.length)map.fitBounds(bounds,{padding:[30,30]});else map.setView([11.5,78.5],6)},120)}
+function cleanCoordinate(v){const s=String(v??"").trim();if(isPlaceholderValue(s))return NaN;if(/^0+(\.0+)?$/.test(s))return 0;const n=Number(s);return Number.isFinite(n)?n:NaN}
+function getCoords(r){
+  let lat=cleanCoordinate(r.liveLat),lng=cleanCoordinate(r.liveLong);
+  if(!validIndiaLatLng(lat,lng)){
+    lat=cleanCoordinate(r.lat);
+    lng=cleanCoordinate(r.long);
+  }
+  return validIndiaLatLng(lat,lng)?{lat,lng}:null;
+}
+function validLatLng(lat,lng){return Number.isFinite(lat)&&Number.isFinite(lng)&&lat>=-90&&lat<=90&&lng>=-180&&lng<=180&&!(Math.abs(lat)<0.000001&&Math.abs(lng)<0.000001)}
+function validIndiaLatLng(lat,lng){
+  if(!validLatLng(lat,lng))return false;
+  // Strict India dashboard guardrail. Prevents accidental Africa/Gulf/0,0 plotting from bad sheet data.
+  // Covers mainland India plus Lakshadweep and Andaman/Nicobar, with a small buffer.
+  const minLat=5.5,maxLat=37.8,minLng=67.0,maxLng=98.8;
+  return lat>=minLat&&lat<=maxLat&&lng>=minLng&&lng<=maxLng;
+}
+function getSheet1VerifiedInstitutionRows(){return (loadedSheets.Institution_Master||[]).filter(r=>isYes(r["Verified"])&&profileMatch(pick(r,["SDE Name","SDE_Name","SDE"]))).map(r=>({visitDate:r["Visit_Date"]||r["Visit Date"]||r["Date"]||""}))}function getOutputCounterRowsForChart(){return (loadedSheets.Output||[]).map(r=>normalizeRow(r,"Output")).filter(r=>getRowDate(r)&&profileMatch(r.sde))}function outputCounterCount(row){return 1}function renderDateChart(){renderBarChartByDate({canvasId:"institutionDateChart",chartVar:"institution",label:"Verified Institutions",tooltipLabel:"Verified institutions",rows:getSheet1VerifiedInstitutionRows(),valueGetter:r=>1});renderBarChartByDate({canvasId:"counterDateChart",chartVar:"counter",label:"Verified Counters",tooltipLabel:"Counters",rows:getOutputCounterRowsForChart(),valueGetter:r=>outputCounterCount(r)})}
+function renderBarChartByDate(cfg){const canvas=document.getElementById(cfg.canvasId);if(!canvas)return;if(cfg.chartVar==="institution"&&institutionDateChart){institutionDateChart.destroy();institutionDateChart=null}if(cfg.chartVar==="counter"&&counterDateChart){counterDateChart.destroy();counterDateChart=null}const data={};cfg.rows.forEach(r=>{const d=getRowDate(r);if(!d)return;const monthly=trackerModes[cfg.chartVar]==="month";const k=monthly?dateKey(d).slice(0,7):dateKey(d),value=Number(cfg.valueGetter(r)||0);if(!data[k])data[k]={count:0,date:d};data[k].count+=value});const keys=Object.keys(data).sort(),values=keys.map(k=>data[k].count),maxVal=Math.max(0,...values);const chartAreaBg={id:"chartAreaBg_"+cfg.canvasId,beforeDraw(chart){const {ctx,chartArea}=chart;if(!chartArea)return;ctx.save();ctx.fillStyle="#ffffff";ctx.shadowColor="rgba(15,23,42,.06)";ctx.shadowBlur=12;ctx.fillRect(chartArea.left,chartArea.top,chartArea.right-chartArea.left,chartArea.bottom-chartArea.top);ctx.restore()}};const valueLabelPlugin={id:"valueLabelPlugin_"+cfg.canvasId,afterDatasetsDraw(chart){const ctx=chart.ctx;ctx.save();ctx.font="900 11px Arial";ctx.textAlign="center";ctx.textBaseline="middle";chart.getDatasetMeta(0).data.forEach((bar,i)=>{const val=String(values[i]);const w=Math.max(28,ctx.measureText(val).width+14);const x=bar.x-w/2,y=bar.y-28;ctx.fillStyle="#0f172a";roundRect(ctx,x,y,w,20,10,true,false);ctx.fillStyle="#ffffff";ctx.fillText(val,bar.x,y+10)});ctx.restore()}};const gradientPlugin={id:"gradientPlugin_"+cfg.canvasId,beforeDatasetsDraw(chart){const {ctx,chartArea}=chart;if(!chartArea)return;const gradient=ctx.createLinearGradient(0,chartArea.top,0,chartArea.bottom);gradient.addColorStop(0,"#2563eb");gradient.addColorStop(.55,"#1d4ed8");gradient.addColorStop(1,"#93c5fd");chart.data.datasets[0].backgroundColor=gradient;chart.data.datasets[0].borderColor="#1e40af";chart.data.datasets[0].hoverBackgroundColor="#16a34a"}};const chart=new Chart(canvas,{type:"bar",data:{labels:keys.map(k=>trackerModes[cfg.chartVar]==="month"?data[k].date.toLocaleDateString("en-IN",{month:"short",year:"numeric"}):formatISODate(data[k].date)),datasets:[{label:cfg.label,data:values,borderWidth:1,borderRadius:10,borderSkipped:false,barPercentage:.72,categoryPercentage:.62}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:850,easing:"easeOutQuart"},layout:{padding:{top:38,right:18,left:10,bottom:6}},plugins:{legend:{position:"top",align:"end",labels:{usePointStyle:true,pointStyle:"rectRounded",boxWidth:10,boxHeight:10,padding:18,font:{weight:"900",size:12},color:"#334155"}},tooltip:{backgroundColor:"#0f172a",titleFont:{weight:"900",size:13},bodyFont:{weight:"800",size:12},padding:12,cornerRadius:12,displayColors:false,callbacks:{label:c=>cfg.tooltipLabel+": "+c.parsed.y.toLocaleString("en-IN")}}},scales:{x:{grid:{display:false},ticks:{color:"#475569",font:{weight:"800",size:11},maxRotation:45,minRotation:0}},y:{beginAtZero:true,suggestedMax:maxVal?Math.ceil(maxVal*1.30):5,border:{display:false},grid:{color:"rgba(148,163,184,.22)",drawTicks:false},ticks:{precision:0,color:"#64748b",font:{weight:"800"},padding:8}}}},plugins:[chartAreaBg,gradientPlugin,valueLabelPlugin]});if(cfg.chartVar==="institution")institutionDateChart=chart;if(cfg.chartVar==="counter")counterDateChart=chart}
+function roundRect(ctx,x,y,w,h,r,fill,stroke){if(w<2*r)r=w/2;if(h<2*r)r=h/2;ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();if(fill)ctx.fill();if(stroke)ctx.stroke()}
+function getDumpRows(scope){return scope==="today"?allRows.filter(isToday):allRows}function downloadTodayDump(){downloadInstitutionDump("today")}function downloadInstitutionDump(scope){const rows=getDumpRows(scope);const headers=["Source","Region","State","District","Institution Type","Institution Name","Pincode","Lat","Long","SDE Name","Verified","Audit_ID","Submission_Time","Visit_Date","Institution_Open_Status","Live_Lat","Live_Long","Entry_Allowed","Entry_Not_Allowed_Reason","Main_MRP_Counter_Availability","Number_of_Counters","Main Order Value","Opposite_MRP_Counter_Availability","Number_of_Opposite_Counters","Opposite Order Value","Total Counters","Total Order Value","Valid Phone Count","Invalid Phone Count","Visit_Status","Remarks","Institution_Photo_Link"];const body=rows.map(r=>[r.sourceType,r.region,r.state,r.district,r.institutionType,r.institutionName,r.pincode,r.lat,r.long,r.sde,isVerified(r)?"Yes":"No",r.auditId,r.submissionTime,(r.visitDate||r.date),r.institutionOpenStatus,r.liveLat,r.liveLong,r.entryAllowed,r.entryNotAllowedReason,r.mrpCounterAvailability,r.mainCounters.length||r.numberOfCounters,mainOrderValue(r),r.mrpCounterAvailabilityOpposite,r.oppositeCounters.length||r.numberOfOppositeCounters,oppositeOrderValue(r),r.counters.length,totalOrderValue(r),validPhoneCount(r),invalidPhoneCount(r),r.visitStatus,r.remarks,r.institutionPhoto]);downloadXls(headers,body,"LIA_Project_"+(scope==="today"?"Todays":"Full")+"_Dump.xls")}
+function downloadCounterDump(){const headers=["Counter Side","Institution Name","Audit_ID","State","District","Institution Type","SDE Name","Counter No","Outlet Name","Phone 10 Digit","Phone Status","Visi Cooler Doors","Counter Status","Counter Visit Status","Ownership Type","Order Value","Outlet Photo Link","Submission Time","Visit_Date"];const body=[];allRows.filter(isVerified).forEach(r=>{if(!r.counters.length)body.push(["",r.institutionName,r.auditId,r.state,r.district,r.institutionType,r.sde,"","","","Missing","","","","",0,"",r.submissionTime,(r.visitDate||r.date)]);r.counters.forEach(c=>body.push([c.side,r.institutionName,r.auditId,r.state,r.district,r.institutionType,r.sde,c.counterNo,c.outletName,c.phone,c.phone?"Valid":"Invalid / Missing",c.visiCoolerDoors,c.counterStatus,c.counterVisitStatus,c.ownershipType,c.orderValue,c.photo,r.submissionTime,(r.visitDate||r.date)]))});const billedBody=body.map(row=>row.map(v=>typeof v==="string"?v.replace(/\bcracked\b/gi,"Billed"):v));downloadXls(headers,billedBody,"LIA_Project_Counter_Dump.xls")}
+function downloadXls(headers,body,fileName){let html="<html><head><meta charset='UTF-8'></head><body><table border='1'><thead><tr>";headers.forEach(h=>html+="<th>"+excelSafe(h)+"</th>");html+="</tr></thead><tbody>";body.forEach(row=>{html+="<tr>";row.forEach(v=>html+="<td>"+excelSafe(v)+"</td>");html+="</tr>"});html+="</tbody></table></body></html>";const blob=new Blob([html],{type:"application/vnd.ms-excel;charset=utf-8;"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fileName;document.body.appendChild(a);a.click();document.body.removeChild(a)}
+function getDriveImage(url){if(!url)return"";const text=String(url).trim();const m=text.match(/\/d\/([^/]+)/)||text.match(/[?&]id=([^&]+)/);return m&&m[1]?"https://drive.google.com/thumbnail?id="+m[1]+"&sz=w1400":text}function yesBadge(v){return v?'<span class="badge badge-yes">Yes</span>':'<span class="badge badge-no">No</span>'}function displayLabel(v){return String(v||"").replace(/\bcracked\b/gi,"Billed")}function display(v,f="Not Available"){const s=String(v||"").trim();return displayLabel(s?s:f)}function safe(v){return String(v||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;")}function safeForJs(v){return String(v||"").replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/\"/g,"&quot;")}function excelSafe(v){return safe(v)}function openImage(src){document.getElementById("modalImage").src=src;document.getElementById("imageModal").style.display="flex"}function closeImage(){document.getElementById("imageModal").style.display="none"}
+setTimeout(()=>{if(document.getElementById("loading").style.display!=="none"){setHtml("loadingStage","Still connecting with database...");}},8000);
+</script>
+<script>
+(()=>{
+const arena=document.getElementById('skyArena'), c=document.getElementById('skyCanvas'), ctx=c.getContext('2d'), hero=document.getElementById('skyHero'), overlay=document.getElementById('skyOverlay'), btn=document.getElementById('skyStart');
+const W=840,H=280, clamp=(v,a,b)=>Math.max(a,Math.min(b,v)); let best=0;try{best=Number(localStorage.getItem('liaJumpBest'))||0}catch(e){} document.getElementById('skyBest').textContent=best;
+const ground=235,x=105; let counting=false,running=false,y=ground-25,vy=0,score=0,objects=[],spawn=0,last=0;
+function draw(){ctx.fillStyle='#dbeafe';ctx.fillRect(0,0,W,H);ctx.fillStyle='#bfdbfe';for(let i=0;i<10;i++){let bx=((i*105-score*3)%1050+1050)%1050-80;ctx.fillRect(bx,ground-45-(i%3)*18,65,100)}ctx.fillStyle='#64748b';ctx.fillRect(0,ground,W,H-ground);ctx.fillStyle='#f8fafc';ctx.fillRect(0,ground, W,3);for(const o of objects){if(o.coin){ctx.fillStyle='#f59e0b';ctx.beginPath();ctx.arc(o.x,o.y,12,0,Math.PI*2);ctx.fill();ctx.fillStyle='white';ctx.font='bold 16px Arial';ctx.textAlign='center';ctx.fillText('★',o.x,o.y+5)}else{ctx.fillStyle='#334155';ctx.fillRect(o.x,ground-o.h,o.w,o.h);ctx.fillStyle='#ef4444';ctx.fillRect(o.x,ground-o.h,o.w,7)}}hero.style.left=(x/W*100-6)+'%';hero.style.top=(y/H*100-11)+'%';document.getElementById('skyScore').textContent=Math.floor(score)}
+function start(){if(running||counting)return;counting=true;btn.disabled=true;overlay.style.display='flex';let n=3;btn.textContent=n;const timer=setInterval(()=>{if(arena.offsetParent===null){clearInterval(timer);counting=false;return}n--;if(n>0){btn.textContent=n;return}clearInterval(timer);counting=false;btn.disabled=false;begin();},1000)}
+function begin(){running=true;y=ground-25;vy=0;score=0;objects=[];spawn=1;last=0;overlay.style.display='none';draw();requestAnimationFrame(frame)}
+function jump(){if(running&&y>=ground-25-.1){vy=-540}}
+function stop(){running=false;best=Math.max(best,Math.floor(score));try{localStorage.setItem('liaJumpBest',best)}catch(e){}document.getElementById('skyBest').textContent=best;btn.textContent='Game over - Score '+Math.floor(score)+' | Play again';overlay.style.display='flex'}
+btn.addEventListener('click',start);
+arena.addEventListener('pointerdown',e=>{if(e.target===btn)return;if(running){e.preventDefault();jump()}});
+window.addEventListener('keydown',e=>{if(arena.offsetParent===null||!['ArrowUp','Space'].includes(e.code)||e.repeat)return;e.preventDefault();if(running)jump();else if(!counting)start()});
+function frame(t){if(!running)return;if(arena.offsetParent===null){stop();return}const dt=last?Math.min(.04,(t-last)/1000):0;last=t;score+=dt*10;const speed=240+Math.min(220,score*.7);vy+=1250*dt;y+=vy*dt;if(y>=ground-25){y=ground-25;vy=0}spawn-=dt;if(spawn<=0){const h=30+Math.random()*30;objects.push({x:W+20,w:30+Math.random()*18,h});if(Math.random()<.7)objects.push({x:W+20,y:ground-115,coin:true});spawn=1.35+Math.random()*.55}let hit=false;for(const o of objects){o.x-=speed*dt;if(o.coin){if(Math.abs(x-o.x)<35&&Math.abs(y-o.y)<30){o.hit=true;score+=25}}else if(x+24>o.x&&x-24<o.x+o.w&&y+19>ground-o.h&&y-19<ground){hit=true}}objects=objects.filter(o=>o.x>-70&&!o.hit);draw();if(hit){stop();return}requestAnimationFrame(frame)}
+draw();
+start();
+})();
+</script>
+</body>
+</html>
