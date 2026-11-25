@@ -233,6 +233,9 @@
 .other-note{font-size:10px;color:#9a3412;font-weight:900;margin-left:6px}
 
 .summary-controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:end}.summary-controls label{flex:1;min-width:160px;font-size:11px;font-weight:900;color:#475569}.summary-controls select{display:block;width:100%;margin-top:5px;padding:9px;border:1px solid #cbd5e1;border-radius:9px;background:white;color:#1f2937;font-weight:700}.tracker-actions{margin:0 0 14px}.profile-banner{padding:10px 14px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;margin-bottom:14px;font-weight:900;color:#1e40af}</style>
+<style>
+.game-screen.hero-steering .hero-wrap{animation:none!important;left:var(--hero-x)!important;top:var(--hero-y)!important;transform:rotate(var(--hero-tilt,0deg));transition:left 90ms linear,top 90ms linear,transform 120ms ease-out;pointer-events:none;}
+</style>
 </head>
 <body>
 <div class="header">
@@ -248,61 +251,24 @@
 
 <div class="container"><div id="profileBanner" class="profile-banner" style="display:none"></div>
   <div id="loading" class="loading">
-    <div class="game-loader">
-      <div class="game-screen">
-        <div class="game-cloud gc1"></div>
-        <div class="game-cloud gc2"></div>
-        <div class="game-cloud gc3"></div>
-        <div class="game-hud">
-          <div class="hud-pill">AUTO PLAY</div>
-          <div class="hud-pill">MISSION: FIELD HERO</div>
-          <div class="hud-pill">SCORE <b id="gameScore">0000</b></div>
-        </div>
-        <div class="game-level" id="gameLevel">LEVEL 1</div>
-        <div class="game-message" id="gameMission">Flying through SDE sheets</div>
-        <div class="game-item coin coin1">₹</div>
-        <div class="game-item coin coin2">★</div>
-        <div class="game-item coin coin3">◎</div>
-        <div class="game-item badge-item item-sde">SDE</div>
-        <div class="game-item badge-item item-kpi">KPI</div>
-        <div class="game-item badge-item item-map">MAP</div>
-        <div class="game-item badge-item item-img">IMG</div>
-        <div class="game-obstacle obs1"></div>
-        <div class="game-obstacle obs2"></div>
-        <div class="hero-wrap" aria-label="Free generic superhero loader">
-          <div class="hero-trail"></div>
-          <div class="hero-nameplate">DATA HERO</div>
-          <svg class="hero-svg" viewBox="0 0 180 95" role="img">
-            <defs>
-              <linearGradient id="heroCapeGrad" x1="0" x2="1" y1="0" y2="1">
-                <stop offset="0%" stop-color="#ef4444"/>
-                <stop offset="100%" stop-color="#991b1b"/>
-              </linearGradient>
-              <linearGradient id="heroSuitGrad" x1="0" x2="1" y1="0" y2="1">
-                <stop offset="0%" stop-color="#38bdf8"/>
-                <stop offset="100%" stop-color="#1d4ed8"/>
-              </linearGradient>
-            </defs>
-            <path class="hero-cape" d="M82 40 C122 22 154 21 175 38 C151 45 133 59 106 80 C97 68 89 55 82 40Z" fill="url(#heroCapeGrad)" stroke="#0f172a" stroke-width="3"/>
-            <ellipse cx="54" cy="75" rx="31" ry="7" fill="rgba(15,23,42,.16)"/>
-            <path d="M66 25 L111 35 C119 37 122 45 116 52 L100 70 C92 79 78 76 72 66 L57 40 C53 32 58 23 66 25Z" fill="url(#heroSuitGrad)" stroke="#0f172a" stroke-width="4"/>
-            <path class="hero-arm-front" d="M80 30 L133 18 C141 16 146 21 143 28 C141 32 137 34 132 35 L86 43Z" fill="#fbbf24" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
-            <circle cx="146" cy="25" r="8" fill="#fbbf24" stroke="#0f172a" stroke-width="4"/>
-            <path d="M66 48 L27 65 C19 69 12 63 15 55 C17 51 21 49 26 48 L61 36Z" fill="#fbbf24" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
-            <path d="M92 66 L122 82 C130 86 127 95 118 93 L85 78Z" fill="#dc2626" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
-            <path d="M75 66 L94 88 C100 95 93 101 86 96 L64 72Z" fill="#dc2626" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
-            <circle cx="57" cy="28" r="20" fill="#fbbf24" stroke="#0f172a" stroke-width="4"/>
-            <path d="M39 23 C45 7 67 7 77 21 C66 18 55 20 45 28Z" fill="#111827"/>
-            <circle cx="64" cy="29" r="2.2" fill="#0f172a"/>
-            <path d="M49 35 C55 39 61 39 67 35" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round"/>
-            <path d="M82 41 L101 45 L91 60 L73 57Z" fill="#facc15" stroke="#0f172a" stroke-width="3"/>
-            <text x="87" y="56" text-anchor="middle" font-size="15" font-weight="900" fill="#1d4ed8" font-family="Arial">H</text>
-          </svg>
-        </div>
-        <div class="game-ground"></div>
-        <div class="ground-dash"></div>
-      </div>
-    </div>
+<div id="skyGame" style="max-width:850px;margin:0 auto 12px;text-align:center">
+<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:8px 0;color:#1e40af"><b>DATA HERO: JUMP RUN</b><span>Score <b id="skyScore">0</b> | Best <b id="skyBest">0</b></span></div>
+<div id="skyArena" style="position:relative;overflow:hidden;border-radius:14px;border:1px solid #93c5fd;touch-action:none;aspect-ratio:  3 / 1;min-height:180px;background:#dbeafe">
+<canvas id="skyCanvas" width="840" height="280" style="width:100%;height:100%;position:absolute;inset:0"></canvas>
+<div id="skyHero" style="position:absolute;width:12%;height:22%;pointer-events:none"><svg style="width:100%;height:100%;overflow:visible" viewBox="0 0 100 100" role="img" aria-label="Superhero facing right">
+<path d="M43 32 Q22 34 7 63 L39 57 L28 83 Q49 68 56 42Z" fill="#dc2626" stroke="#991b1b" stroke-width="2"/>
+<path d="M47 56 L65 72 L80 78 M46 57 L38 76 L24 88" fill="none" stroke="#1d4ed8" stroke-width="13" stroke-linecap="round"/>
+<path d="M72 75 L84 81 M32 81 L22 90" stroke="#dc2626" stroke-width="12" stroke-linecap="round"/>
+<path d="M44 30 Q61 27 65 44 L59 61 L39 57 L36 43Z" fill="#2563eb" stroke="#172554" stroke-width="2"/>
+<path d="M57 36 L72 46 L85 36" fill="none" stroke="#2563eb" stroke-width="10" stroke-linecap="round"/><circle cx="86" cy="35" r="6" fill="#f6c28b"/>
+<path d="M40 40 L52 49 L35 57" fill="none" stroke="#1d4ed8" stroke-width="9" stroke-linecap="round"/>
+<path d="M40 55 L60 59" stroke="#facc15" stroke-width="5"/>
+<path d="M48 36 L60 38 L54 49 L44 40Z" fill="#facc15"/><text x="53" y="43" text-anchor="middle" font-size="8" font-weight="bold" fill="#dc2626">S</text>
+<path d="M46 12 Q62 5 71 18 L71 23 L77 28 L71 31 Q70 40 58 38 Q45 36 44 24Z" fill="#f6c28b" stroke="#172554" stroke-width="2"/>
+<path d="M44 25 Q37 8 54 6 Q71 3 73 17 L63 15 L57 23 L54 16 L47 26Z" fill="#111827"/><circle cx="67" cy="23" r="2" fill="#111827"/>
+</svg></div>
+<div id="skyOverlay" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#eff6ffbb"><button id="skyStart" type="button" style="background:#1d4ed8;color:white;border:0;border-radius:20px;padding:12px 24px;font-weight:bold;cursor:pointer" disabled>3</button></div></div>
+<div style="font-size:12px;color:#475569;margin-top:7px">Click to jump · Tap or press Space / ↑ · Dodge obstacles and collect coins</div></div>
     <div class="loading-title">LIA Project Dashboard</div>
     <div class="loading-subtitle"></div>
     <div id="loadingStage" style="font-size:16px;font-weight:800;margin-bottom:8px;color:#374151;">Please Wait Connecting with Database...</div>
@@ -410,6 +376,7 @@ const SDE_SHEET_NAMES=[
   "Gurpreet Singh",
   "Narmada Jaiswal",
   "Rahul Mewada",
+  "Rahul",
   "Samarth"
 ];
 const SHEETS=[
@@ -422,7 +389,7 @@ const SHEETS=[
 let loadedSheets={},loadIndex=0,currentScript=null,allRows=[],filteredRows=[],tableMode="verifiedPhoto",mapFilter="verified",map,mapMarkers=[],institutionDateChart=null,counterDateChart=null;
 let typeOtherExpanded={overallTypeTable:false,todayTypeTable:false};
 const TABLE_PAGE_SIZE=100, MAP_POINT_LIMIT=1500, COUNTER_CARD_LIMIT=150;let currentPage=1;
-function updateLoading(percent,stage){setHtml("loadingPercent",percent+"%");setHtml("loadingStage",stage);const b=document.getElementById("loadingBar");if(b)b.style.width=percent+"%";const score=document.getElementById("gameScore");if(score)score.textContent=String(percent*15).padStart(4,"0");const level=document.getElementById("gameLevel");if(level)level.textContent="LEVEL "+Math.min(5,Math.max(1,Math.ceil(percent/20)));const mission=document.getElementById("gameMission");if(mission)mission.textContent=percent<30?"Flying through SDE sheets":percent<60?"Scanning counters & photos":percent<90?"Flying over map & tables":"Landing dashboard"}
+function updateLoading(percent,stage){setHtml("loadingPercent",percent+"%");setHtml("loadingStage",stage);const b=document.getElementById("loadingBar");if(b)b.style.width=percent+"%";}
 
 window.onload=()=>loadAllSheets();
 function loadAllSheets(){document.getElementById("loading").style.display="block";updateLoading(1,"Initializing Dashboard");loadedSheets={};loadIndex=0;loadNextSheet()}
@@ -538,36 +505,25 @@ function getDumpRows(scope){return scope==="today"?allRows.filter(isToday):allRo
 function downloadCounterDump(){const headers=["Counter Side","Institution Name","Audit_ID","State","District","Institution Type","SDE Name","Counter No","Outlet Name","Phone 10 Digit","Phone Status","Visi Cooler Doors","Counter Status","Counter Visit Status","Ownership Type","Order Value","Outlet Photo Link","Submission Time","Visit_Date"];const body=[];allRows.filter(isVerified).forEach(r=>{if(!r.counters.length)body.push(["",r.institutionName,r.auditId,r.state,r.district,r.institutionType,r.sde,"","","","Missing","","","","",0,"",r.submissionTime,(r.visitDate||r.date)]);r.counters.forEach(c=>body.push([c.side,r.institutionName,r.auditId,r.state,r.district,r.institutionType,r.sde,c.counterNo,c.outletName,c.phone,c.phone?"Valid":"Invalid / Missing",c.visiCoolerDoors,c.counterStatus,c.counterVisitStatus,c.ownershipType,c.orderValue,c.photo,r.submissionTime,(r.visitDate||r.date)]))});const billedBody=body.map(row=>row.map(v=>typeof v==="string"?v.replace(/\bcracked\b/gi,"Billed"):v));downloadXls(headers,billedBody,"LIA_Project_Counter_Dump.xls")}
 function downloadXls(headers,body,fileName){let html="<html><head><meta charset='UTF-8'></head><body><table border='1'><thead><tr>";headers.forEach(h=>html+="<th>"+excelSafe(h)+"</th>");html+="</tr></thead><tbody>";body.forEach(row=>{html+="<tr>";row.forEach(v=>html+="<td>"+excelSafe(v)+"</td>");html+="</tr>"});html+="</tbody></table></body></html>";const blob=new Blob([html],{type:"application/vnd.ms-excel;charset=utf-8;"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fileName;document.body.appendChild(a);a.click();document.body.removeChild(a)}
 function getDriveImage(url){if(!url)return"";const text=String(url).trim();const m=text.match(/\/d\/([^/]+)/)||text.match(/[?&]id=([^&]+)/);return m&&m[1]?"https://drive.google.com/thumbnail?id="+m[1]+"&sz=w1400":text}function yesBadge(v){return v?'<span class="badge badge-yes">Yes</span>':'<span class="badge badge-no">No</span>'}function displayLabel(v){return String(v||"").replace(/\bcracked\b/gi,"Billed")}function display(v,f="Not Available"){const s=String(v||"").trim();return displayLabel(s?s:f)}function safe(v){return String(v||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;")}function safeForJs(v){return String(v||"").replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/\"/g,"&quot;")}function excelSafe(v){return safe(v)}function openImage(src){document.getElementById("modalImage").src=src;document.getElementById("imageModal").style.display="flex"}function closeImage(){document.getElementById("imageModal").style.display="none"}
-setTimeout(()=>{if(allRows.length===0){document.getElementById("loading").style.display="block";document.getElementById("loading").innerHTML=`<div class="game-loader"><div class="game-screen"><div class="game-cloud gc1"></div><div class="game-cloud gc2"></div><div class="game-cloud gc3"></div><div class="game-hud"><div class="hud-pill">AUTO PLAY</div><div class="hud-pill">MISSION: FIELD HERO</div><div class="hud-pill">SCORE <b id="gameScore">0000</b></div></div><div class="game-level" id="gameLevel">LEVEL 1</div><div class="game-message" id="gameMission">Flying through database...</div><div class="game-item coin coin1">₹</div><div class="game-item coin coin2">★</div><div class="game-item coin coin3">◎</div><div class="game-item badge-item item-sde">SDE</div><div class="game-item badge-item item-kpi">KPI</div><div class="game-item badge-item item-map">MAP</div><div class="game-item badge-item item-img">IMG</div><div class="game-obstacle obs1"></div><div class="game-obstacle obs2"></div><div class="hero-wrap" aria-label="Free generic superhero loader">
-          <div class="hero-trail"></div>
-          <div class="hero-nameplate">DATA HERO</div>
-          <svg class="hero-svg" viewBox="0 0 180 95" role="img">
-            <defs>
-              <linearGradient id="heroCapeGrad" x1="0" x2="1" y1="0" y2="1">
-                <stop offset="0%" stop-color="#ef4444"/>
-                <stop offset="100%" stop-color="#991b1b"/>
-              </linearGradient>
-              <linearGradient id="heroSuitGrad" x1="0" x2="1" y1="0" y2="1">
-                <stop offset="0%" stop-color="#38bdf8"/>
-                <stop offset="100%" stop-color="#1d4ed8"/>
-              </linearGradient>
-            </defs>
-            <path class="hero-cape" d="M82 40 C122 22 154 21 175 38 C151 45 133 59 106 80 C97 68 89 55 82 40Z" fill="url(#heroCapeGrad)" stroke="#0f172a" stroke-width="3"/>
-            <ellipse cx="54" cy="75" rx="31" ry="7" fill="rgba(15,23,42,.16)"/>
-            <path d="M66 25 L111 35 C119 37 122 45 116 52 L100 70 C92 79 78 76 72 66 L57 40 C53 32 58 23 66 25Z" fill="url(#heroSuitGrad)" stroke="#0f172a" stroke-width="4"/>
-            <path class="hero-arm-front" d="M80 30 L133 18 C141 16 146 21 143 28 C141 32 137 34 132 35 L86 43Z" fill="#fbbf24" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
-            <circle cx="146" cy="25" r="8" fill="#fbbf24" stroke="#0f172a" stroke-width="4"/>
-            <path d="M66 48 L27 65 C19 69 12 63 15 55 C17 51 21 49 26 48 L61 36Z" fill="#fbbf24" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
-            <path d="M92 66 L122 82 C130 86 127 95 118 93 L85 78Z" fill="#dc2626" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
-            <path d="M75 66 L94 88 C100 95 93 101 86 96 L64 72Z" fill="#dc2626" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
-            <circle cx="57" cy="28" r="20" fill="#fbbf24" stroke="#0f172a" stroke-width="4"/>
-            <path d="M39 23 C45 7 67 7 77 21 C66 18 55 20 45 28Z" fill="#111827"/>
-            <circle cx="64" cy="29" r="2.2" fill="#0f172a"/>
-            <path d="M49 35 C55 39 61 39 67 35" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round"/>
-            <path d="M82 41 L101 45 L91 60 L73 57Z" fill="#facc15" stroke="#0f172a" stroke-width="3"/>
-            <text x="87" y="56" text-anchor="middle" font-size="15" font-weight="900" fill="#1d4ed8" font-family="Arial">H</text>
-          </svg>
-        </div><div class="game-ground"></div><div class="ground-dash"></div></div></div><div class="loading-title">LIA Project Dashboard</div><div style="font-size:18px;font-weight:900;color:#374151;">Still connecting with database...</div><div class="loading-dots"><span></span><span></span><span></span></div><div style="font-size:13px;font-weight:800;color:#64748b;margin-top:8px;">Large database can take time. Do not refresh immediately.</div>`;updateLoading(12,"Still connecting with database...")}},8000);
+setTimeout(()=>{if(document.getElementById("loading").style.display!=="none"){setHtml("loadingStage","Still connecting with database...");}},8000);
+</script>
+<script>
+(()=>{
+const arena=document.getElementById('skyArena'), c=document.getElementById('skyCanvas'), ctx=c.getContext('2d'), hero=document.getElementById('skyHero'), overlay=document.getElementById('skyOverlay'), btn=document.getElementById('skyStart');
+const W=840,H=280, clamp=(v,a,b)=>Math.max(a,Math.min(b,v)); let best=0;try{best=Number(localStorage.getItem('liaJumpBest'))||0}catch(e){} document.getElementById('skyBest').textContent=best;
+const ground=235,x=105; let counting=false,running=false,y=ground-25,vy=0,score=0,objects=[],spawn=0,last=0;
+function draw(){ctx.fillStyle='#dbeafe';ctx.fillRect(0,0,W,H);ctx.fillStyle='#bfdbfe';for(let i=0;i<10;i++){let bx=((i*105-score*3)%1050+1050)%1050-80;ctx.fillRect(bx,ground-45-(i%3)*18,65,100)}ctx.fillStyle='#64748b';ctx.fillRect(0,ground,W,H-ground);ctx.fillStyle='#f8fafc';ctx.fillRect(0,ground, W,3);for(const o of objects){if(o.coin){ctx.fillStyle='#f59e0b';ctx.beginPath();ctx.arc(o.x,o.y,12,0,Math.PI*2);ctx.fill();ctx.fillStyle='white';ctx.font='bold 16px Arial';ctx.textAlign='center';ctx.fillText('★',o.x,o.y+5)}else{ctx.fillStyle='#334155';ctx.fillRect(o.x,ground-o.h,o.w,o.h);ctx.fillStyle='#ef4444';ctx.fillRect(o.x,ground-o.h,o.w,7)}}hero.style.left=(x/W*100-6)+'%';hero.style.top=(y/H*100-11)+'%';document.getElementById('skyScore').textContent=Math.floor(score)}
+function start(){if(running||counting)return;counting=true;btn.disabled=true;overlay.style.display='flex';let n=3;btn.textContent=n;const timer=setInterval(()=>{if(arena.offsetParent===null){clearInterval(timer);counting=false;return}n--;if(n>0){btn.textContent=n;return}clearInterval(timer);counting=false;btn.disabled=false;begin();},1000)}
+function begin(){running=true;y=ground-25;vy=0;score=0;objects=[];spawn=1;last=0;overlay.style.display='none';draw();requestAnimationFrame(frame)}
+function jump(){if(running&&y>=ground-25-.1){vy=-540}}
+function stop(){running=false;best=Math.max(best,Math.floor(score));try{localStorage.setItem('liaJumpBest',best)}catch(e){}document.getElementById('skyBest').textContent=best;btn.textContent='Game over - Score '+Math.floor(score)+' | Play again';overlay.style.display='flex'}
+btn.addEventListener('click',start);
+arena.addEventListener('pointerdown',e=>{if(e.target===btn)return;if(running){e.preventDefault();jump()}});
+window.addEventListener('keydown',e=>{if(arena.offsetParent===null||!['ArrowUp','Space'].includes(e.code)||e.repeat)return;e.preventDefault();if(running)jump();else if(!counting)start()});
+function frame(t){if(!running)return;if(arena.offsetParent===null){stop();return}const dt=last?Math.min(.04,(t-last)/1000):0;last=t;score+=dt*10;const speed=240+Math.min(220,score*.7);vy+=1250*dt;y+=vy*dt;if(y>=ground-25){y=ground-25;vy=0}spawn-=dt;if(spawn<=0){const h=30+Math.random()*30;objects.push({x:W+20,w:30+Math.random()*18,h});if(Math.random()<.7)objects.push({x:W+20,y:ground-115,coin:true});spawn=1.35+Math.random()*.55}let hit=false;for(const o of objects){o.x-=speed*dt;if(o.coin){if(Math.abs(x-o.x)<35&&Math.abs(y-o.y)<30){o.hit=true;score+=25}}else if(x+24>o.x&&x-24<o.x+o.w&&y+19>ground-o.h&&y-19<ground){hit=true}}objects=objects.filter(o=>o.x>-70&&!o.hit);draw();if(hit){stop();return}requestAnimationFrame(frame)}
+draw();
+start();
+})();
 </script>
 </body>
 </html>
